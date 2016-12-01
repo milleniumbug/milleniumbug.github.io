@@ -1,0 +1,50 @@
+
+
+<h1>One Definition Rule</h1>
+<p>
+ODR is the One Definition Rule. This means, essentially, that each thing (usually function) can only be defined once. Unfortunately, even though violating the ODR is a compile-time error, the Standard does not require a compiler error. Instead, violating it is UB. </p><div class="well"><code>
+// main.cpp<br/>
+int f() { return 5; }<br/>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;return f();<br/>
+}<br/>
+// f.cpp<br/>
+int f() { return 6; }<br/>
+</code></div><p>
+This violates the ODR, as <code>::f</code> is defined twice. This is fine for some kinds of function, but as we'll see soon, it's not enough for many others. Thus, <code>inline</code> was born. Specifically, <code>inline</code> refers to a compiler optimization known as <i>inlining</i>. However, it does not actually imply that optimization at all, something that can cause confusion. Instead, what it means is that the ODR does not apply. However, if they do not have identical bodies, then UB.<br/>
+ </p><div class="well"><code>
+// main.cpp<br/>
+inline int f() { return 5; }<br/>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;return f();<br/>
+}<br/>
+// f.cpp<br/>
+// inline int f() { return 6; } // Still UB if not commented out<br/>
+inline int f() { return 5; } // This is perfectly fine and legal.<br/>
+</code></div><p>
+Of note is that all class members which are defined right in the class are automatically considered inline, but may still be declared inline. Class definitions are one per translation unit. <br/>
+<br/>
+Templates hold a special place here. They are not only inline, they <i>must</i> be inline. It is impossible to link a template definition from another file. All templates are what is known as "header-only"- that is, you can only use a template if you have the full source code right there in your source code file. You can still define function templates and class templates later (in some cases), and in some cases their declared forms are useful, but they must be defined once in each translation unit to be used.</p><div class="well"><code>
+// f.cpp<br/>
+template&lt;typename T&gt; void f() {}<br/>
+// main.cpp<br/>
+template&lt;typename T&gt; void f();<br/>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;f&lt;int&gt;(); // Compiler cries: definition of f not available<br/>
+}<br/>
+<br/>
+</code></div><p>
+As you can see, we're going to have to start duplicating a lot of code across multiple source files if we want to use non-trivial programs. For that, we will use the preprocessor.<br/>
+<br/>
+Exercise: What happens if you have a function template <code>f</code>, that calls a function template <code>g</code>, where <code>g</code> was defined after <code>f</code>?<br/>
+</p>
+<ul class="pager">
+  <li class="previous">
+<a href="Declarations.html">&larr; Declarations</a>
+  </li>
+  <li class="next">
+<a href="Include.html"><code>#include</code> &rarr;</a>
+  </li>
+</ul>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

@@ -1,0 +1,48 @@
+
+
+
+
+<p>
+Two-phase initialization. Because virtual functions cannot be called from a constructor as previously documented, this leads to an all-too-common workaround: simply have another function that calls them.</p><div class="well"><code>
+class Base {<br/>
+public:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;Base() {}<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;void Initialize() { f(); }<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;virtual void f() = 0;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;~Base() {}<br/>
+};<br/>
+class Derived : public Base {<br/>
+public:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;void f() { /* stuff */ }<br/>
+};<br/>
+</code></div><p>
+This is extremely harmful. Our guarantee that <code>Derived d;</code> actually creates a <code>d</code> object has just gone away. Now any <code>Derived</code> object might or might not exist in some kind of half-constructed state, where it really needs a good cup of coffee. And what are the side effects of calling <code>Initialize</code> twice, or trying to call member functions before it's done? Who knows? Hope you memorized the documentation on these points- if it even exists. If you ever handle any <code>Derived</code> object, you must consider the possibility that it has not been properly <code>Initialize</code>d. Plus, of course, the class vendor had to put extra effort into documenting and implementing these scenarios. This becomes even worse when you consider how it might interact with template code that assumes that a constructed object is, well, ready to go, when in fact <code>Derived</code> is not.<br/>
+<br/>
+Indeed, it's questionable as to whether it's ever necessary to call virtual functions in the constructor for a good design.<br/>
+<br/>
+However, more directly, you really want to skip all that hassle and just use a <i>private</i> factory function to ensure that it's dealt with.</p><div class="well"><code>
+class Base {<br/>
+public:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;Base() {}<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;virtual void f() = 0;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;~Base() {}<br/>
+protected:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;void Initialize() { f(); }<br/>
+};<br/>
+class Derived : public Base {<br/>
+public:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;void f() { /* stuff */ }<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;static Derived create() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Derived d;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;d.Initialize();<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return d;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;Derived(const Derived&);<br/>
+private:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;// constructors<br/>
+};<br/>
+</code></div><p>
+Public two-phase initialization is always a mistake.<br/>
+</p>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

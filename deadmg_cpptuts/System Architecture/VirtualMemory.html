@@ -1,0 +1,32 @@
+﻿
+
+
+
+
+<h1>Virtual Memory</h1>
+<p>The mathematical theory of computing was first developed by Alan Turing. Thus, not accidentally, a general-purpose computer is called a Turing Machine, and all general-purpose languages are Turing-Complete. The model 
+    Turing created of a general-purpose computer involved an infinite (real computers, obviously, have finite) memory. Each memory cell can be accessed individually by index- in other words, a giant array. Each cell had 
+    to be at least one bit or it wouldn't be of any use, but on modern machines we use bytes. This means that, principally, a pointer is a simple integer, and the Standard will even let you cast between them, although 
+    actually doing so is a stupendously bad idea unless some old API makes you. This integer refers to a byte of memory in RAM, or "physical memory".
+</p>
+<p>Virtual memory is a layer over this system. The pointers we really deal with are in fact mapped by the CPU and operating system through an address translation table. This table is one per process. The integer referenced
+    above is of a fixed size, and this is the "bitness" of the processor. x86 is 32bit, and x64 is 64bit. This means that any program operating in 32bit mode can only access 2^32 bytes of memory, ever. The OS restricts 
+    this further by typically reserving the entire top half of the address space for it's own needs. This means that regardless of how much physical memory you have, you can only ever use up to 2GB per 32bit process.
+    You can ask the operating system to reduce the amount it uses for itself, but this can produce unreliable results on some OSes. The fact that physical memory sizes for desktops approached this limit is one of the main 
+    motivations of 64bit processors. Now it is typical for higher-end desktops to have many times more than the 2GB limit. On 64bit, this limitation disappears, as 2^64 is a ridiculously large amount, even when half is 
+    restricted.
+</p>
+<p>As with caches, virtual memory is not continuous. It comes in discrete chunks, called pages. A page on x86 is 4KB, and on x64 it is 8KB. The OS can only allocate memory to a process in terms of pages. </p>
+<p>If the address you attempt to de-reference does not map to a physical address, (an address in physical memory), an OS routine is invoked to fix the problem. This mechanism can be used for several purposes. Firstly, the 
+    OS can simply decide to raise an error. This is a SIGSEGV on Unix, or an Access Violation on Windows, and it's what happens when you attempt to access memory that the OS did not give to your process, through mapping it
+    in this table. This means, explicitly, that since the program does not and indeed, cannot, ever deal in physical addresses, it is impossible for it to access the memory of another process unless the OS explicitly 
+    allows it to. This is part of what makes systems with virtual memory much more secure and reliable than their predecessors.
+</p>
+<p>Secondly, the OS can choose to load data from some other source. Typically, this is the hard drive, but it can also be the GPU or even over a network or anywhere if the OS supports it. Once loaded, the OS adds it to 
+    the table, and then retries the operation. A common use of this is memory mapped files. This is where, when you attempt to access the memory, the OS will load a page from disk into RAM at that page, then map that 
+    virtual address to the page which it has just mapped in. When you write to the page, the OS orders writes to the disk. This way, you can pretend that a file is a flat buffer of memory. It is very efficient for 
+    random access into files, and sparse reads/writes.
+</p>
+
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

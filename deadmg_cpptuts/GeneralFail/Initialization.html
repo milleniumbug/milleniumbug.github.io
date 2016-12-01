@@ -1,0 +1,24 @@
+﻿
+
+
+
+
+<h1>Initialization</h1>
+<p>Oh, the joys of initialization. There are a few too many kinds of initialization in C++. Most of the time, the distinctions are meaningless, but sometimes the subtleties can bite you in confusing and surprising ways 
+if you're not up to speed.</p>
+<h2><i>copy-initialization</i></h2>
+<p>This is what happens when you initialize a variable using <code>=</code>, such as <code>int x = 5;</code>. It is directly equivalent to creating a temporary from the one argument, and then copying or moving that- hence, the name is a bit of a 
+misnomer, since it might also be a move-initialization. The reason this is confusing is because if you have a non-movable non-copyable type, you therefore cannot use this form. In addition, some people expect 
+an assignment, since the <code>=</code> kinda indicates that. But there is none.</p>
+<h2><i>value-initialization</i></h2>
+<p>This is the simplest form of initialization. All primitive types have a sensible default value- usually 0 or their equivalent of it, which is what you get when they are <i>value-initialized</i>. Types with a 
+default constructor are default constructed. Primitive temporaries are <i>value-initialized</i> (for example <code>int()</code>) but primitive lvalues like <code>int i;</code> are not.</p>
+<h2><i>default-initialization</i></h2>
+<p>Effectively the same as <i>value-initialization</i>, but more fun, because primitive types are left uninitialized- reading them is UB. This is what happens when you do <code>int i;</code>. The upshot of this is that 
+for all types except primitives, <code>T t;</code> is constructed properly and safe to go with.</p>
+<h2><i>direct-initialization</i></h2>
+<p>What happens when you call the constructor directly, through <code>int i(5);</code>. There are no semantic surprises or pitfalls here, but you can have the joys of the <a href="MostVexingParse.html">Most Vexing Parse.</a></p>
+// Todo: Brace/uniform initialization and aggregate initialization.
+
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

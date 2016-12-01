@@ -1,0 +1,34 @@
+
+
+
+
+<h1><code>iostreams</code></h1>
+<p>
+Our previous example of <code>std::string</code> was just bloat. But IOstreams have some much more sinister problems. They are based on a complex inheritance hierarchy using <i>multiple inheritance</i>. If you want to even check a reference for them, you have to scroll through about ten different base classes. As previously documented, this is a decidedly inferior solution to templates. And then we have the problem of <code>operator&gt;&gt;</code>. When writing functions, we wrote a <code>read</code> function. This is because the IOstreams model is fundamentally unsafe.</p><div class="well"><code>
+int i;<br/>
+std::cin &gt;&gt; i;<br/>
+std::cout &lt;&lt; i; // UB if input failed.<br/>
+</code></div><p>
+In addition, this depends on <code>int</code> being default-constructible- which it is, but not all custom types are. IOStreams have some truly hideously named functions. For example, what does <code>ate</code> do? Check whether or not the stream ate something? Or <code>unitbuf</code>? <code>setf</code>? <code>xalloc</code>? <br/>
+<br/>
+You can set text formatting flags, but not easily check if they're set, or save or restore their state, so when you call a foreign function you have no idea what flags are set when they return. Not to mention <code>std::bstreambuf</code>, with functions like <code>eback</code> and <code>egptr</code>. Plus, of course, if you set some stream state, and then an exception is thrown, then you're in trouble.<br/>
+<br/>
+Let's look at the jobs done by <code>std::ostream</code>. It buffers- and a whole bunch of this buffering is public API, too. It localizes. It formats text. It converts from various other types to text. Oh, and it does I/O too. Instead, we should follow SRP (Single Responsibility Principle) and give each of these jobs to a separate class- and buffering can probably be almost entirely an implementation detail of the I/O dedicated class.<br/>
+<br/>
+In addition, it shares a couple downsides from <code>std::string</code>, such as it also doesn't use expression templates, so when you use a <code>std::stringstream</code> to insert many elements, it also has O(n^2) complexity, and a complete failure for Unicode.<br/>
+<br/>
+IOStream is only good for the simplest use cases. It rapidly falls apart if you want to start adding extra data sources, or using the more complex functions. <br/>
+<br/>
+For complex string interpretation, you will need tools called lexers and parsers. These specialist tools are meaningfully adept at handling strings that are more complex, and typically used in the  implementation of programming languages.</p>
+<p>The lesson is, split up your responsibilities. Have one class for each purpose. Don't smush them together.</p>
+    
+<ul class="pager">
+  <li class="previous">
+      <a href="stdstring.html">&larr; <code>std::string</code></a>
+  </li>
+  <li class="next">
+      <a href="ID3D11DeviceContext.html"><code>ID3D11DeviceContext</code> &rarr;</a>
+  </li>
+</ul>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

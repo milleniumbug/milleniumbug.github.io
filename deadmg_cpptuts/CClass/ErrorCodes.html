@@ -1,0 +1,50 @@
+
+
+
+
+<p>
+Error codes are a simple concept- your function returns a type. At least some values of this type indicate some kind of failure. Sometimes, the other values are normal returns, sometimes they indicate success. This is very bad. For example, consider</p><div class="well"><code>
+auto var = returns_error_code();<br/>
+do_stuff(var);<br/>
+</code></div><p>
+You will observe that this is completely non-safe, because I didn't check whether or not <code>var</code> was valid. In addition, there is no type safety here- no guarantee that any given <code>var</code> is actually valid, instead of error. Even if you observe the best practices, your code rapidly becomes a mess. Observe:</p><div class="well"><code>
+auto var = returns_error_code();<br/>
+if (is_bad(var)) handle_error();<br/>
+auto var2 = returns_error_code();<br/>
+if (is_bad(var2)) handle_error();<br/>
+</code></div><p>
+You can see the repetitive nature of the code. Typically, this is "fixed" with <code>goto</code> handling and SESE. SESE is Single Entry Single Exit, and is where each function has one, and exactly one, return point. This makes it much easier to ensure resource cleanup when the compiler doesn't have your back.</p><div class="well"><code>
+&nbsp;&nbsp;&nbsp;&nbsp;auto code = a_failure_code;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;auto var = returns_error_code();<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;if (is_bad(var)) goto end;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;auto var2 = returns_error_code();<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;if (is_bad(var2)) goto cleanup_var;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;auto var3 = returns_error_code();<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;if (is_bad(var3)) goto cleanup_var2;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;// logic<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;code = a_success_code;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;cleanup_3(var3);<br/>
+cleanup_var2:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;cleanup_2(var2);<br/>
+cleanup_var:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;cleanup_1(var);<br/>
+end:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;return code;<br/>
+</code></div><p>
+This stack, when maintained correctly, <i>can</i> ensure cleanup of all resources in both success and failure. But maintaining it is an endless headache- the slightest change in function logic requires extensive changes which can never be shown to be safe or correct, and I hope you never need multiple return points. What you can also see is that the error handling mess consumes the whole function- there's no actual function logic here.<br/>
+<br/>
+In addition, it requires "out parameters". These are almost as bad. These are similar to what you see in <code>std::cin</code>.</p><div class="well"><code>
+T t;<br/>
+auto ret = returns_error_code(t); // If success, t holds result<br/>
+</code></div><p>
+Of course, this requires <code>T</code> to be default constructible, and if you didn't check then reading <code>t</code> could be UB, or some meaningless default, or any kind of bad.<br/>
+<br/>
+What's even worse is when the "failure" code could be a real return value- for example, functions which parse integers from strings that return 0 on failure. Did it parse "0" or parse "WHAARRRGARBL"? We'll never know.<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+</p>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

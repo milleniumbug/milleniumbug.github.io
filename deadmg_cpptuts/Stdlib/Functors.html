@@ -1,0 +1,62 @@
+
+
+
+
+<h1>Function Objects</h1>
+<p>
+Function objects are variables, which you can call like a function. <code>std::hash</code> is a function object. The simplest function object is a class with <code>operator()</code> overloaded- this allows us to call the object directly.</p><div class="well"><code>
+class X {<br/>
+public:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;void operator()() {}<br/>
+};<br/>
+</code></div><p>
+The first parenthesis are the operator, and the second are used for arguments. Whereas most operators are binary or unary, <code>operator()</code> can take and return arbitrary types.<br/>
+ </p><div class="well"><code>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;X x;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;x(); // Legal<br/>
+}<br/>
+</code></div><p>
+This allows us to write some interesting code. Given our previous definition of bubblesort, we will here produce a version which allows you to replace <code>&lt;</code> with any custom comparator, which allows us to provide an arbitrary ordering.</p><div class="well"><code>
+<br/>
+&nbsp;template&lt;typename random_iterator, typename comparator&gt; <br/>
+&nbsp;void bubble_sort(random_iterator begin, random_iterator end, comparator comp) {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;while(true) {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;bool swaps = false;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for(auto it = begin; it != (end - 1); ++it) {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (!(comp(*it, *(it + 1)))) {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::swap(*it, *(it + 1));<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;swaps = true;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (!swaps) break;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br/>
+&nbsp;}<br/>
+</code></div><p>
+Now we will generate a simple ascending functor (short name for a class with <code>operator()</code> overloaded) that will sort the list ascending.</p><div class="well"><code>
+class ascending {<br/>
+public:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;bool operator()(const int& lhs, const int& rhs) {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return lhs &gt; rhs;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br/>
+};<br/>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::vector&lt;int&gt; x; <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;// fill x<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;bubble_sort(x.begin(), x.end(), ascending());<br/>
+}<br/>
+</code></div><p>
+Now we can use the same function to sort the list by any criterion we choose. You could, of course, simply parameterise <code>ascending</code> on the type of <code>int</code> to cleanly use <code>operator&gt;</code> for any types that have it. In fact, the Standard has you covered on this one- meet <code>std::greater&lt;T&gt;</code>, which is exactly that. There is also <code>std::less&lt;T&gt;</code>, <code>std::plus&lt;T&gt;</code>, and a few other handy-dandy pre-provided functors which can serve this purpose.<br/>
+<br/>
+There are two other primary ways to create a function object- binding, and lambdas. We will wait to meet binding, as it's less useful in comparison to lambdas.<br/>
+</p>
+<ul class="pager">
+  <li class="previous">
+    <a href="Sort.html">&larr; <code>std::sort</code></a>
+  </li>
+  <li class="next">
+    <a href="Lambdas.html">Lambdas &rarr;</a>
+  </li>
+</ul>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

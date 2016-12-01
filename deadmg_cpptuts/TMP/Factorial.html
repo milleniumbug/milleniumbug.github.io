@@ -1,0 +1,41 @@
+
+
+
+
+<h1>Factorial</h1>
+<p>
+Template meta-programming (TMP) generally refers to using templates to create programs that execute at compile-time. C++'s templates are so powerful, they are Turing-Complete, which essentially qualifies them to be an entire separate language in their own right. Some (insane) people have used them to do things like parse, and execute, other languages at compile-time. I shudder to think. But they can be used for a lot more that's sane and productive. We will begin by demonstrating some simple template metaprograms.<br/>
+<br/>
+The factorial function is the "Hello, World" of TMP. Remember our previous definition- way back in "Recursion". Here, we will implement something you might find familiar in an unfamiliar way.</p><div class="well"><code>
+template&lt;int N&gt; struct factorial {<br/>
+public: <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;static const int value = factorial&lt;N - 1&gt;::value * N;<br/>
+};<br/>
+template&lt;&gt; struct factorial&lt;0&gt; {<br/>
+public: <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;static const int value = 1;<br/>
+};<br/>
+</code></div><p>
+Now we can compute the factorial of values. The difference between our previous function and this one is that it <i>guarantees</i> to execute at compile-time, but the logic is essentially the same- recursion, and the specialization forms the base case. To understand how it functions, we will need to meet template specialization and Integral Constant Expressions (ICE).<br/>
+<br/>
+First, a little syntax. Previously, we defined functions as, for example, <code>my_class::func</code>. But the <code>::</code> operator can be used to access pretty much anything (except <code>private</code> or <code>protected</code> members, if necessary) that a class has as a member- including values. For now, restrict this to exclusively static members, the non-static-member situation isn't fun. Conventionally, the <code>value</code> member is used for the result of a template computation.<br/>
+<br/>
+A template specialization is a fairly simple concept. It is what happens when you change the definition of a template, for some given template argument. In the above, we chose to change the definition of <code>factorial&lt;N&gt;</code> if <code>N == 0</code>. Functions can only be <i>explicitly</i> specialized- this means that you can only specialize them with all template parameters. But classes (and structs) can also be specialized for when only some template arguments are given, and the compiler will match it, similar to function overloading.</p><div class="well"><code>
+template&lt;typename T&gt; struct F {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;static const int value = 1;<br/>
+};<br/>
+template&lt;typename T&gt; struct F&lt;std::vector&lt;T&gt;&gt; {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;static const int value = 2;<br/>
+};<br/>
+</code></div><p>
+This is a <i>partial</i> specialization. Any instantiation of <code>std::vector</code> gives the value of 2, and everything else gives 1. The exact partial specialization rules are, well, large and complex- much worse than function overloading. As with function overloading, it's really best to keep it simple.<br/>
+<br/>
+An ICE (not to be confused with Internal Compiler Error, which is also known as an ICE) is a value, of some integral type, which the compiler is guaranteed to know. This basically means literals, and <code>static const</code> values which were initialized with ICEs or expressions involving only ICEs. No function calls (except <code>constexpr</code>, which we will look at later), no statements, nothing else. This means that <code>1</code> is an ICE, and <code>factorial&lt;0&gt;::value</code> is an ICE, therefore <code>factorial&lt;1&gt;::value</code> is an ICE, and so forth. This means that you can use them as, for example, template parameters. <br/>
+</p>    
+<ul class="pager">
+  <li class="next">
+      <a href="TemplateTypename.html"><code>template</code> and <code>typename</code> &rarr;</a>
+  </li>
+</ul>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

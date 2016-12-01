@@ -1,0 +1,30 @@
+
+
+
+
+<p>
+The <code>void</code> type indicates nothing- the function returns nothing. It also has an older, deprecated use- to indicate that a function takes no arguments. In older versions of C, then</p><div class="well"><code>
+void f();<br/>
+</code></div><p>
+indicated that f took unknown or variable arguments, and <i>you</i> had to do the type matching. To indicate it took <i>none</i>, you had to do</p><div class="well"><code>
+void f(void);<br/>
+</code></div><p>
+This is either deprecated or outright illegal in C++, but you can still find it in many C++ compilers for compatibility. The Visual C++ debugger will refer to functions taking no arguments as <code>(void)</code>. In addition, what's more insidious is that you can <i>point</i> to void- that is, <code>void*</code> is a legal type. Strictly, it refers to an untyped pointer. As you can imagine, this is all sorts of unsafe mess and bad. The only thing you can do with a <code>void*</code> pointer is cast it to another type. It's used for "generic" arguments- for example, <code>qsort</code>.</p><div class="well"><code>
+T arr[5]; // Must be POD for this.<br/>
+qsort(arr, sizeof(arr) / sizeof(T), sizeof(T), [](const void* lhs, const void* rhs) -&gt; int{<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;if (*static_cast&lt;const T*&gt;(lhs) &lt; *static_cast&lt;const T*&gt;(rhs))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return 1;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;else if (*static_cast&lt;const T*&gt;(lhs) == *static_cast&lt;const T*&gt;(rhs))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return 0;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;else<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return -1;<br/>
+});<br/>
+</code></div><p>
+Importantly, this only works for POD Ts, as <code>qsort</code> will use a <code>memcpy</code> style routine to copy them, and in addition, the comparator is <i>not</i> a binary predicate- the exact interface is a bit different. Here, <code>arr</code> and the comparator arguments are <code>void*</code>, to allow the one function to sort arbitrarily typed arrays. Of course, it's impossible to use it to sort a linked list or a deque or a circular buffer, unlike <code>std::sort</code>.<br/>
+<br/>
+In C++, they have very limited use compared to inheritance or templates as  a form of abstraction, but you may well need to deal with them for C APIs.<br/>
+<br/>
+Also documented here is the equally bad pointer to integer conversion. Essentially, each pointer can be converted to an integer (of the correct size) and back again. This is safe as long as the integer is large enough, and the types are correct (both enforced by you, not the compiler). For example, the Windows <code>SetWindowLongPtr</code> function- rather than taking a <code>void*</code>, it takes a <code>LONG_PTR</code>. This is a signed integer guaranteed to be large enough to hold a pointer. You can then get this value back in a fashion similar to the <code>void*</code> arguments we discussed in function pointers.<br/>
+</p>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

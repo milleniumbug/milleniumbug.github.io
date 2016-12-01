@@ -1,0 +1,25 @@
+
+
+
+
+<p>
+To add to the party, we are going to have to deal with <i>normalization</i>. Essentially, each glyph may be one <i>or more</i> codepoints. In some languages like Vietnamese, they can be up to seven. But what's more fun is that some characters in the set can be encoded in <i>more than one way</i>. <br/>
+<br/>
+We have a <i>combining mark</i>. This combining mark is "accent". When you have the Unicode equivalent of "a" "accent", you get an a with an accent, and when you have "e" "accent" you get an e with an accent, and such thing. There are many combining marks- some letters can have more than one. But there is also a dedicated codepoint for "e with accent". This immediately outlaws any kind of simple comparison- after all, who would want "e" "accent" to not compare equal to "e with accent"? Thus, we introduce <i>normalization</i>.<br/>
+<br/>
+Normalization converts a Unicode string to a specific form. Each series of Unicode characters has one, and only one, representation in any given form. There are two major forms and two subforms- NFC, NFKC, NFD, and NFKD. NFC converts a string to a <i>composed</i> form- that is, "e" "accent" becomes "e with accent". Thus, if we normalize both arguments, and then compare the outcome, then we can get a real comparison (but only equivalence- lexicographical order is another topic). NFC is Normal Form Composed. NFKC is the <i>compatibility</i> version of NFC- it composes some things which aren't really equal, but are kinda similar and some previous standards did have them as equal. There's not much reason to use compatibility unless you're looking for, well, backwards compatibility.<br/>
+<br/>
+To contrast NFC, NFD <i>decomposes</i>- that is, "e with accent" becomes "e" "accent".<br/>
+<br/>
+Once they have been normalized, we can do a simple codepoint-by-codepoint equivalence test to show equivalence (or not). In addition, we'll have to normalize before hashing a Unicode string.<br/>
+<br/>
+Implementing the sorting order of strings is even more problematic. Different languages impose different orders on the same codepoints, and even worse, it can change depending on the intending use case. It is impossible to define the code points so that a simple binary comparison will produce the intended results for all languages, or even one specific language. In addition, certain contractions introduce special cases, as well as where dialects of certain languages differ.<br/>
+<br/>
+Implementing these algorithms yourself is only for the bold. You can find them described in detail in the Unicode Standard. But it's wiser to find a library which has already implemented them for you. ICU (International Components for Unicode) is one, although it's API is truly disgusting (probably because it was automatically translated from Java). Unfortunately, it's hard to find good C++ Unicode support out there in the wild without being tied to a framework like Qt. Even if you did, you'd still be stuck with all those APIs which take <code>std::string</code>.<br/>
+<br/>
+And you don't want to know what's involved in timezones and whatnot.<br/>
+<br/>
+The point is, a string is not just a string, it's an encoded piece of text, there are few "simple" operations, and the C++ Standard really leaves you in the dust on this one. Sorry.<br/>
+</p>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

@@ -1,0 +1,28 @@
+﻿
+
+
+
+
+<h1>Cache Associativity</h1>
+<p>Previously, we treated the cache like a nice black box. Insert address, get out cache line. Unfortunately, it is not that simple. CPUs typically operate on N-way associative caches, with 16-way being common now. This 
+    means that they only look at sixteen bits of the address when finding a slot in the cache. The cache then can store X amount of lines in each slot. This makes lookup/insertion much faster, and we will look at a 
+    similar structure, a hash table. Unfortunately, it also produces a slight problem- namely, that the cache can only store X lines which have the same sixteen bits. This means that if you iterate through a 
+    contiguous chunk of memory at the wrong granularity, you can get some very nasty surprises.
+</p>
+<div class="well"><code>
+int main() {
+    auto& arr1 = *new std::array&lt;std::array&lt;int, 8192&gt;, 8192&gt;();
+    auto& arr2 = *new std::array&lt;std::array&lt;int, 8192&gt;, 8193&gt;();
+    for(int i = 0; i < arr1.size(); i++)
+        arr1[i][0] *= 2;
+    for(int i = 0; i < arr2.size(); i++)
+        arr2[i][0] *= 2;
+}
+</code></div>
+<p>The time on my CPU for the first loop is 0.000138. The second is 0.000108. This is a nearly 30% increase. Expect more extreme results on older hardware than mine (i7 930). This is because each address I am trying
+    to access is using up the same slots in the cache, causing it to run out of slots promptly. This causes the cache to fail far more often, causing a significant increase in the time of the loop. However, in the 
+    8193 loop, this is not quite at the same slot, so the CPU can use different slots and thus will have sufficient slots to use.
+</p>
+
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

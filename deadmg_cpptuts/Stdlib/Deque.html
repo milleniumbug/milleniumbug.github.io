@@ -1,0 +1,27 @@
+
+
+
+
+<h1><code>std::deque</code></h1>
+<p>A deque is a double-ended queue. It lives in <code>&lt;deque&gt;</code>. Whilst other libraries tend to use more stringent specifications, the C++ deque is more akin to a vector. However, it has a number of advantages- for example, deques can insert or erase from both the front and the back very quickly, whereas for the vector fast insertion and erasure is available only at the back.</p>
+<div class="well"><code>
+std::deque&lt;int&gt; x;<br/>
+x.push_back(5);<br/>
+x.push_front(7); // Adds 7 to the front of the deque- not available on vector<br/>
+int i = x[0]; // Offers random access through [] like vector<br />
+x.pop_back();<br/>
+x.pop_front(); // Erases the front item<br/>
+</code></div>
+<p>Deques also offer random-access like <code>vector</code> and <code>size()</code>. However, unlike a <code>vector</code>, when pushing or popping at the front or back of a <code>deque</code>, it is guaranteed that your pointers and references are still valid. In addition, because <code>deque</code> does not require a single block of contiguous memory, it can be implemented in a much more intelligent fashion that does not require moving all the existing elements when the current capacity is exceeded. This advantage can save significant time when modifying a large <code>deque</code>. We will look at exactly how it is implemented later.</p>
+<p>In many of the earlier pieces of C++ reference material, it was advised that <code>vector</code> be the default container of choice. However, <code>deque</code> is often superior, and more common advice now is to use <code>deque</code> by default, although <code>vector</code> is still the simplest container around.</p>
+<p>As a final note, in the implementation shipped with Visual Studio, as of the time of writing (23/10/2012), <code>deque</code> has a fairly crippling implementation error that makes it almost unusably slow beyond trivial examples.</p>
+<ul class="pager">
+  <li class="previous">
+    <a href="Vector.html">&larr; <code>std::vector</code></a>
+  </li>
+  <li class="next">
+    <a href="Tuple.html"><code>std::tuple</code> &rarr;</a>
+  </li>
+</ul>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

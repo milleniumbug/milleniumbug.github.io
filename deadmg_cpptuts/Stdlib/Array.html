@@ -1,0 +1,34 @@
+
+
+
+
+<h1><code>std::array</code></h1>
+<p>An array is a fairly simple concept. Arrays are a block of memory, of known type and size. They contain N instances of type T. You can select any instance of T with an integer at run-time. This is a very fast operation. The Standard provides <code>std::array</code> in <code>&lt;array&gt;</code>. We can use the <code>[]</code> notation to retrieve or inspect the values in an array. In addition, we may take a reference or pointer to an array content- <code>operator[]</code> returns an lvalue, the object in the array. Finally, this is our first encounter with a non-type template argument. The typical non-type template argument is an integer, but it can also be other things in more specialized situations. Here, the type argument specifies the type of the array, and the integer specifies the number of that type which the array holds.</p>
+<div class="well"><code>
+#include &lt;iostream&gt;<br/>
+#include &lt;array&gt;<br/>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::array&lt;int, 5&gt; arr;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;arr[3] = 5;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; arr[3];<br/>
+}<br/>
+</code></div>
+<p>Of note is that array indexing is zero-based, not one-based- so <code>arr[3]</code> is actually the <i>fourth</i> element of the array. Accessing with <code>[]</code> past the end of the array is UB. You can, however, use <code>at()</code> to get an exception thrown if it is not within the bounds. Arrays are copyable if their contents are, and movable if their contents are.</p>
+<p>Here, we will also meet initializer lists. As you can imagine, initializing our five-element array with five accesses is tedious- and not helpful if the elements are not default constructible. Fortunately, we can use an <i>initializer list</i> to construct each element with the given argument.</p>
+<div class="well"><code>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::array&lt;int, 5&gt; arr = { 1,2,3,4,5 };<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; arr[3]; // outputs 4<br/>
+&nbsp;}<br/>
+</code></div>
+<p>This syntax is re-usable with many Standard components. You will get a compiler error if you supply too many items. If you don't supply enough, the remainder will be <i>value-initialized</i>. This means that even for types like <code>int</code> which unhelpfully don't initialize themselves, you will get an initialized value. For all primitives, this value is 0, or it's equivalent, like <code>nullptr</code> or <code>false</code>. This is the equivalent of <code>int i = int();</code>.</p>
+<p>Arrays are simple structures, but their extremely fast lookup time to any element is the basis of high performance in many more advanced data structures.</p>
+<p>Also of note is that we meet another implementation detail- the stack. All function-local variables and temporary objects live "on the stack". This has a finite amount of space, like dynamic memory, but is <i>much</i> smaller (and <i>much</i> faster). So if you allocate too many <code>int</code>, you will overflow the stack (use more memory than the stack has available). This is UB, and there is no way to know how big the stack is, although most implementations provide a means to set the size before the program starts. In addition, all function calls and function-local variables consume some stack memory. Most programs don't have a problem with stack size, but if you abuse your stack, you can get an overflow. Large arrays and non-tail recursion are the leading causes of stack overflow. The Standardese for an object which behaves this way is "automatic storage duration"- or, in other words, the compiler is responsible for cleaning up the object.</p>
+<p>Exercise: How large can you make the size argument to your array?</p>
+<ul class="pager">
+  <li class="next">
+    <a href="Vector.html"><code>std::vector</code> &rarr;</a>
+  </li>
+</ul>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

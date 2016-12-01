@@ -1,0 +1,27 @@
+
+
+
+
+<p>
+Variable arguments were the only way in C to write a function which took a variable number of arguments, or arguments of variable types, whereas in C++ we would use variadic templates or operator overloading to handle such situations. As you may not be surprised to learn, variable arguments are hideously unsafe and completely non-extensible, and should never be used in a C++ program. As we learned when dealing with SFINAE, the way to indicate a variable argument is <code>...</code>. Note that a catch-all <code>catch(...) { /* stuff */ }</code> is <i>not</i> a variable argument- you cannot access the exception object. You must also include <code>&lt;cstdarg&gt;</code> to get these facilities.</p><div class="well"><code>
+int sum(int num, ...) {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;va_list args; // Implementation-defined type<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;va_start(args, num);<br/>
+</code></div><p>
+The <code>va_start</code> macro takes the <code>va_list</code> and initializes it. In addition, it takes as a parameter the function argument before the variable arguments. As usual, UB results if you make a mistake. Also note that <code>num</code> is the number of arguments in the variable arguments. There is no way to determine this except by containing the information in a non-variable argument, so if you make a mistake, UB. </p><div class="well"><code>
+&nbsp;&nbsp;&nbsp;&nbsp;int total = 0;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;for(int i = 0; i &lt; num; i++) {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;int next = va_arg(args, int);<br/>
+</code></div><p>
+This macro takes the <code>va_list</code> from earlier, and also a type. It gives us back the instance of that type that is in the next variable argument. Note that <code>va_arg</code> simply assumes that you got the type right- any mistakes and UB. In addition, when passing smaller types like <code>char</code> or <code>short</code>, they are automatically promoted to <code>int</code> and so are actually an <code>int</code>. Note that the type argument cannot be any type which cannot be converted to a pointer by simply adding a <code>*</code> on the end- because it's a macro, no <code>std::add_pointer&lt;T&gt;</code> here.</p><div class="well"><code>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;total += sum;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;va_end(args);<br/>
+</code></div><p>
+<code>va_end</code> simply destroys the <code>va_list</code>. Failure is, of course, UB. You can iterate as many times as you like. In addition, passing a non-POD to a variable arguments function is instantly UB.</p><div class="well"><code>
+}<br/>
+</code></div><p>
+There's no type safety, no run-time safety, and no extensibility or genericity in this function, and the slightest error produces UB. Burn these functions wherever they pop up. The only recommended use of variable arguments is it's hypothetical use when dealing with overloading, as we saw in SFINAE.<br/>
+</p>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

@@ -1,0 +1,44 @@
+
+
+
+
+<h1><code>std::unordered_{map|set}</code></h1>
+<p>An unordered map and set are similar in concept to the regular map and set, but they have a very different implementation. Whereas map and set depended on ordering values, the unordered map and set depend on a hash function for their operation. However, they offer very fast lookup (faster than <code>std::map</code> and <code>std::set</code>) and erasure. </p><div class="well"><code>
+#include &lt;unordered_map&gt;<br/>
+#include &lt;iostream&gt;<br/>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::unordered_map&lt;std::string, int&gt; x;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;x[&quot;Hello&quot;] = 3;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;x[&quot;World&quot;] = 4;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; x[&quot;Flub&quot;];<br/>
+}<br/>
+</code></div><p>
+Yeah, this acts pretty much the same. However, there are different requirements on the key type, as well as different lookup and erasure times. An <code>unordered</code> key type must be comparable to each other through <code>==</code>, that is, just strict equality. Note that if <code>a == b</code> then <code>b == a</code>. Secondly, they must be <i>hashable</i>. A Standard function, <code>std::hash</code>, is used. It can hash pointers, strings, integers, and such things by default, but for our own custom types, it must be told how. This is where we meet <i>template specialization</i>.<br/>
+<br/>
+A template specialization is where you override the default behaviour for a certain set of arguments. The general form of a template</p><div class="well"><code>
+template&lt;typename T&gt; class foo { };<br/>
+</code></div><p>
+may be overridden to be</p><div class="well"><code>
+template&lt;&gt; class foo&lt;int&gt; { int x; };<br/>
+</code></div><p>
+Note that the contents of the specialization does not have to correlate to anything- either the arguments or the contents of the original. In this case, the default form of <code>std::hash</code> does not do anything particularly useful. So we must specialize it for our own type.</p><div class="well"><code>
+class our_type {};<br/>
+template&lt;&gt; class std::hash&lt;our_type&gt; {<br/>
+public:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::size_t operator()(const our_type& arg) const {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// return some hash value<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br/>
+};<br/>
+</code></div><p>
+Writing a hash algorithm isn't fun. The smart move here is to delegate to the Standard hash algorithm for a data member or other significant value. Note that as a class, you first have to construct it and then call it, e.g. <code>std::hash&lt;int&gt;()(5);</code>, a style we will study further later. What's important here is that if <code>a == b</code>, then <code>hash(a) == hash(b)</code>. Hash algorithms have other important features, but by delegating them to our implementation, we can hopefully forget about them for a while. What I and many others consider an unfortunate defect is that the Standard provides no inherent means to combine hashes from multiple sources. You can combine them using XOR if you want, e.g. (1, 2) to hash the same as (2, 1). </p>
+<p>Specialization is covered in more depth later.</p>
+<ul class="pager">
+  <li class="previous">
+    <a href="Map.html">&larr; <code>std::map</code></a>
+  </li>
+  <li class="next">
+    <a href="Iterators.html">Iterators &rarr;</a>
+  </li>
+</ul>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

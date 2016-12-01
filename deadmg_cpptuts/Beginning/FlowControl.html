@@ -1,0 +1,59 @@
+
+
+<h1>Flow Control</h1>
+<p>This is the simple act of making your program make decisions. All of our previous programs did things, but they couldn't change their behaviour- they always did the same thing every time. You could have replaced them with a sticky note on your monitor.</p>
+<p>Now we will write a program whose effects are decided when we execute it. To do this, we will introduce a few new language constructs.</p>
+<p>You may already be familiar with Boolean logic. This is the mathematics of just two states- one, or zero. Fortunately, we will not have to implement any boolean operations ourselves- they come with the language. The boolean type, for storing boolean values, is named <code>bool</code>. <code>bool</code> values can be <code>true</code> or <code>false</code>.</p>
+<p>To make these booleans change our program's behaviour, we will need a language construct or three, and one function.</p>
+<div class="well"><code>
+#include &lt;iostream&gt;<br/>
+#include &lt;cstdlib&gt;<br/>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;bool b = std::rand() % 2;<br/>
+</code></div><p>
+The <code>std::rand</code> function returns a random value. It's not particularly random or well-distributed, but good enough. We here use the modulo operator to force that value into the range 0 or 1, which is then implicitly converted (0 to <code>false</code>, 1 to <code>true</code>). Now the value of <code>b</code>, it's a mystery.</p><div class="well"><code>
+&nbsp;&nbsp;&nbsp;&nbsp;if (b)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; &quot;b was true!\n&quot;;<br/>
+</code></div><p>
+If <code>b</code> is true, then the next statement is executed. If we want to execute multiple statements, we need curly braces (like those around <code>main</code>'s body).</p><div class="well"><code>
+&nbsp;&nbsp;&nbsp;&nbsp;else {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; &quot;b was false!\n&quot;;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; &quot;This makes me sad.&quot;;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br/>
+</code></div><p>
+If <code>b</code> was false, the <code>else</code> is instead executed. Just like for <code>if</code>, we need braces here if we want to use more than one statement.</p>
+<div class="well"><code>
+}<br/>
+</code></div><p>
+This simple program randomly determines which statement to output. In addition, we need to learn about the relational operators. There are six- <code>&lt;</code>, <code>&lt;=</code>, <code>&gt;</code>, <code>&gt;=</code>, <code>!=</code>, <code>==</code>. Not all types support all operators, but the in-built integral types which we have already met all do. These are less than, less than or equal to, greater than, greater than or equal to, not equal to, or equal to, respectively. They all return boolean values indicating if the relation was true or false. We will also meet the <code>while</code> language construct. This construct executes the statement every time the condition is <code>true</code>.</p><div class="well"><code>
+#include &lt;iostream&gt;<br/>
+#include &lt;cstdlib&gt;<br/>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;while((std::rand() % 10) &lt; 5)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; &quot;It was less than five!\n&quot;;<br/>
+}<br/>
+</code></div>
+<p>Every time the random function returns a value less than five (mod ten), the statement will be executed.</p>
+<p>Finally, we meet the <code>!</code> operator. This operator simply inverts the boolean value which was it's argument- if it was true, it becomes false, and if it was false, it becomes true. This allows us to simply express conditions like if something is not true by writing <code>if(!cond)</code> instead of <code>if (cond)</code>.</p>
+<p>After studying a necessary consequence of flow control, called scope, we will have the tools we need to tackle user input.</p>
+<h1>Indentation</h1>
+<p>In these samples, I haven't described indentation. I indented the body of <code>main</code>, but didn't explain why. Now we've met control flow, it's more obvious. The indentation allows us to quickly and easily determine where we are in the source code. If there is no indentation, then we are top-level. If there is just some indentation, then we are in <code>main</code> (or another function or class). Higher than that and we are in a condition- and where the indentation changes clearly reveals where the conditions are. It's worth developing and consistently using an indentation scheme, as it makes your code much easier to peruse. But there's a slight problem with this approach. Observe</p>
+<div class="well"><code>
+int main() {<br />
+&nbsp;&nbsp;&nbsp;&nbsp;if (false)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; &quot;In condition&quot;;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; &quot;Looks like it's in condition but actually isn't&quot;;<br />
+}
+</code></div>
+<p>In the above code, it looks like the two statements are both part of the condition, but actually, the rules above clearly imply that the second statement is, infact, unconditionally executed. You can get automatic indentation tools which will indent your code for you, and many IDEs will automatically insert indentation and other characters to help you out.</p>
+<p>Exercise: The language possesses a <code>for</code> statement. How is it used?</p>
+<ul class="pager">
+  <li class="previous">
+    <a href="UB.html">&larr; Undefined Behaviour</a>
+  </li>
+  <li class="next">
+    <a href="Scope.html">Scope &rarr;</a>
+  </li>
+</ul>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

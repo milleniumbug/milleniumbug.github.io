@@ -1,0 +1,65 @@
+
+
+<h1>Recursion</h1>
+<p>
+Recursion is a powerful programming technique. It allows us to define operations or structures in terms of themselves. The simplest recursive function is the mathematical factorial function, <code>n!</code>, here represented as <code>fact(n)</code>. Along with pointers, it traditionally forms one of the most difficult topics for a beginner.</p><div class="well"><code>
+int fact(int n) {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;if (n &lt; 2) return 1;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;return fact(n - 1) * n;<br/>
+}<br/>
+</code></div><p>
+Notice how we refer to <code>fact</code> in it's own body. This is simple recursion. One of the easiest ways to understand this function is to view it's equivalent as a loop.</p><div class="well"><code>
+int fact(int n) {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;int total = 1;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;for(int i = n; i >= 2; i--) {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;total = total * i;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;return total;<br/>
+}<br/>
+</code></div><p>
+The key points of recursion are that it must have a "base case". The base case is not recursive- that is, the function does not call itself when this condition is true. For <code>fact</code>, this is <code>n < 2</code>. Else, it calls itself again. When <code>fib</code> is viewed as a loop, then the base case is the termination condition of that loop. Else the loop, and the recursion, will be terminated. Also of note for this function is that a 32bit integer can only hold up to approximately <code>21!</code>. Also note that the compiler can automatically convert tail recursion into a loop, and commonly does.<br/>
+<br/>
+It's easy to see how the above function transitions into a loop. However, for some other recursive functions, it's a lot less trivial. For example, consider the fibonacci function.</p><div class="well"><code>
+int fib(int n) {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;if (n &lt; 2) return 1;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;return fib(n - 1) + fib(n - 2);<br/>
+}<br/>
+</code></div><p>
+The loop equivalent of this isn't quite so obvious. In fact, it would require some constructs and concepts that we haven't come across yet. This kind of recursion is especially helpful for us when dealing with recursive data structures. The simplest recursive data structure is a linked list.</p><div class="well"><code>
+struct node {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;node* next; // recursive<br/>
+};<br/>
+</code></div><p>
+Here, each node has a pointer to another node. Given a local node to iterate over, we could write a loop to do it- but that's less obvious to understand than the recursive variant.</p><div class="well"><code>
+void visit(node* p) {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;if (p == nullptr) return;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;// do something with *p<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;return visit(p-&gt;next);<br/>
+}<br/>
+</code></div><p>
+Whereas the iterative loop looks something more along the lines of<br/>
+ </p><div class="well"><code>
+for(node* p = &local_node; p != nullptr; p = p-&gt;next) {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;// do something with *p<br/>
+}<br/>
+</code></div><p>
+Unfortunately, simply modifying the node to have <i>two</i> <code>next</code> pointers (common), then our iterative version is now crying in a corner, and the recursive variant has a simple adjustment to continue.</p><div class="well"><code>
+void visit(node* p) {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;if (p == nullptr) return;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;// do something with *p;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;visit(p-&gt;next1);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;return visit(p-&gt;next2);<br/>
+}<br/>
+</code></div><p>
+Exercise: What do you observe when calling our recursive <code>fib</code> function with increasingly larger arguments?<br/>
+</p>
+<ul class="pager">
+  <li class="previous">
+    <a href="Pointers.html">&larr; Pointers</a>
+  </li>
+  <li class="next">
+      <a href="../Stdlib/index.html">The Standard Library &rarr;</a>
+  </li>
+</ul>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

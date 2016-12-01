@@ -1,0 +1,26 @@
+
+
+
+
+<h1><code>std::list</code></h1>
+<p>A <code>std::list</code> (lives in <code>&lt;list&gt;</code>) is a linked list. This is the data structure we briefly explored in "Recursion". A linked list cannot be indexed (<code>operator[]</code>) but you can <code>pop_back</code>, <code>pop_front</code>, <code>push_back</code>, and <code>push_front</code>. We can also use <code>back()</code> and <code>front()</code> to access the back and front values, respectively.</p>
+<p>Inserting and erasing from the middle of a list is extremely fast, but iterating through it is rather slow. It is more a special-purpose container than one that should see general use. However, they do have very generous pointer invalidation semantics- specifically, each element exists individually and a pointer to an element is only invalidated if that specific element is erased.</p><div class="well"><code>
+std::list&lt;int&gt; x;<br/>
+x.push_back(5);<br/>
+x.pop_back();<br/>
+x.push_front(10);<br/>
+std::cout &lt;&lt; x.front();<br/>
+</code></div><p>
+We also meet <code>std::forward_list</code>. This class can only push or pop at the front- not the back. It's especially uninteresting, so we'll just leave it at that.<br/>
+</p>
+<p>But, unfortunately, I didn't mention how to iterate through a <code>std::list</code>. For that, you will need iterators- the very next topic.</p>
+<ul class="pager">
+  <li class="previous">
+    <a href="UnorderedMap.html">&larr; <code>std::unordered_{map|set}</code></a>
+  </li>
+  <li class="next">
+    <a href="Iterators.html">Iterators &rarr;</a>
+  </li>
+</ul>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

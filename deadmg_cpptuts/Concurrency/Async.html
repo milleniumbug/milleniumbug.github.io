@@ -1,0 +1,36 @@
+
+
+
+
+<p>
+The fundamental cause of concurrency comes from deep down in our processors. Moore's Law states that for every two years, the number of transistors on a CPU increased exponentially- and from about 1970 to 2002, this meant performance of a processor. If you look at a graph of CPU performance over time, it increases exponentially. But in the early part of this millenium, it becamse apparent that there was a slight hitch. Namely, there comes a point where silicon processors simply can't go any faster. Whilst we haven't reached that point yet, there's a definite slowdown in the rate of increase of power of one processor. Thus, it became necessary to look elsewhere for increasing performance.<br/>
+<br/>
+Perhaps the most obvious solution is to simply use your extra transistors to make <i>two</i> processors, instead. After all, two processors are twice as fast as one processor. So you get two processors, you glue them together, and then you ship them as a single unit. Not everything is duplicated, however. So one <i>processor</i> now has multiple <i>cores</i>- meaning it can do multiple distinct bits of work at once. This is great- if you have two heavy-duty programs running at once. But programming <i>one</i> application to use <i>multiple</i> cores is a lot more of a challenge. Particularly, an application must be written to support multiple cores- a regular program cannot be magically adapted to serve this purpose.<br/>
+<br/>
+In addition, you can find concurrency in other places. For example, if you click a button, and the thing that button does takes a while, your user is gonna be clicking some other button and expecting you to respond. This involves both doing work <i>and</i> responding to button clicks at the same time. Another good example is networking. In a network, each machine executes in parallel- your browser and the web server execute concurrently, as they are two separate physical machines that might exist hundreds of miles apart, or more. Thus, being able to deal with concurrency is essential. Whereas previously, our program was a list of instructions, now, it's <i>multiple</i> lists of instructions which are executed in parallel.<br/>
+<br/>
+Like UB, hardware, compiler, and OS details can all affect what goes on in concurrent code. It is impossible to prove the absence of a concurrent bug. In fact, it's very common for parallelism-related bugs to only show up sometimes, or on some platforms, or when a new version of OS/runtime/etc is out. When writing parallel code, it's best to be certain and know exactly what you are doing and that it's well-defined.<br/>
+<br/>
+An <i>asynchronous</i> operation is one where you don't wait for it to complete. You go off and do something else in the meantime. This is in direct opposite to a <i>synchronous</i> operation, where you do wait for it to complete. A <i>blocking</i> operation is a synchronous operation that involves waiting for some external event before continuing. For example, when you do</p><div class="well"><code>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;int i;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::cin &gt;&gt; i; // blocking<br/>
+}<br/>
+</code></div><p>
+When the program executes <code>std::cin &gt;&gt; i</code>, it will take exactly as long as it takes for someone to go and put some input there, if that's no time at all because there was some already there, or a billion years. And your program will be sitting doing nothing waiting in that intervening time (if it's not instant).</p><div class="well"><code>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;int i = 1;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;i = i + i; // synchronous<br/>
+}<br/>
+</code></div><p>
+When you execute <code>i + i</code>, it is synchronous- your program waits for <code>i + i</code> to happen before continuing. But it's not doing nothing - it's adding, so it's synchronous rather than blocking.</p><div class="well"><code>
+#include &lt;future&gt;<br/>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;int i = 1;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::thread t([&] { i = i + i }); // Asynchronous<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;t.join(); // wait so we don't get a data race<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; i;<br/>
+} <br/>
+</code></div>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

@@ -1,0 +1,30 @@
+
+
+
+
+<p>
+Singletons are global state's bigger, nastier, brother. They are the most commonly abused "pattern", although it's increasingly known that they are incredibly bad. The Singleton pattern looks like this:</p><div class="well"><code>
+class Singleton {<br/>
+public:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;static Singleton& GetInstance() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;static Singleton s;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return s;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;// other API<br/>
+private:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;// Constructor<br/>
+};<br/>
+</code></div><p>
+As you can see, we immediately have all the problems of mutable global state in our Singleton class, because the Singleton is public, mutable, and global. In addition, we have the secondary effect that only one Singleton can ever exist in our application, ever. This immediately means that whenever we might decide we actually need two objects of a type that used to be a Singleton, we have to refactor our entire codebase at an unknown cost. Typically, older applications used to use Singletons to represent, say, printers (of course, it's common now to have more than one), screens (multi-screen also very common now), GPUs, and such things of which there would never, ever be two, but ten years down the line and it's routine.<br/>
+<br/>
+Note that there are some things which are truly global and unique- for example, there is only one process-global heap on Windows, there is only one process Standard output handle, etc. Using a Singleton for these could be justified if you could show a reasonable argument that there is a need for the process-global heap to have a different type to a normal heap. Else, it would just be a global variable. Another common use of Singletons which might be justified, if you were desperate, is something like a logger. Often a Manager class.<br/>
+<br/>
+Singletons were primarily used by those who didn't get object-orientation initially. The Singleton "pattern" allows you to use a class and call yourself object-orientated without having to actually deal with any of the object-orientation stuff. Thus, it's a popular crutch for those who find thinking in objects too difficult.<br/>
+<br/>
+Managers. Also known as Engines, Handlers, and similar. The problem with a Manager is fairly evident as soon as you see an example.</p><div class="well"><code>
+class FooManager {<br/>
+</code></div><p>
+Now, pray tell, what does a <code>FooManager</code> do? Even if you knew what a <code>Foo</code> was, this really wouldn't tell you <i>anything</i>. "Manager" is a generic non-name that tells you nothing at all about the class. When you see <code>XManager</code>, then all that can tell you is that the class somehow relates to X. Whenever your design involves a Manager, it's time to do it again. Unfortunately, like Singletons, they're essentially a crutch, and therefore much too common.<br/>
+</p>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

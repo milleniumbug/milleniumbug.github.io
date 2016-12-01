@@ -1,0 +1,53 @@
+
+
+<h1>Escapes</h1>
+<p>
+We saw in the previous tutorial how to output some simple text. You may have discovered or attempted to repeat this statement to output many things. </p><div class="well"><code>
+#include &lt;iostream&gt;<br/>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; &quot;Hello, World!&quot;;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; &quot;This is an introduction to C++&quot;;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; &quot;I r the bestest programmer ever&quot;;<br/>
+}<br/>
+</code></div><p>
+Unfortunately, if you execute this program, you will observe that you do not get three lines of output. You get one line of output- they're all smushed together. To solve this problem, we are going to need something called an "escape". Escapes are what happens when you wish to describe a character which it isn't otherwise possible to enter. The specific escape we are going to use here describes the newline character, and the escape is <code>\n</code>. All escapes in this manner begin with a backslash. The newline character, when output, causes the output to begin a new line. Thus, you can now send output which appears across multiple lines. </p>
+<div class="well"><code>
+#include &lt;iostream&gt;<br/>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; &quot;Hello, World!\n&quot;;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; &quot;This is an introduction to C++\n&quot;;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; &quot;I r the bestest programmer ever&quot;;<br/>
+}<br/>
+</code></div>
+<p>Now our program correctly prints the three lines as three separate lines. Notice that we did not need to add a new line to the last output- the new line character causes the output to move to the next line, but since we didn't output anything else, there's nothing to mvoe there and therefore no point. Escapes also cover other situations. You may have learned that you cannot output the <code>"</code> character.</p><div class="well"><code>
+#include &lt;iostream&gt;<br/>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; &quot;This is the &quot; character&quot;;<br/>
+}<br/>
+</code></div><p>
+Oh no- the compiler cried (common). To understand why, we need to understand a very small piece of how the compiler compiles your program. When attempting to understand what the program means, <code>"</code> has a specific meaning. When the compiler encounters it, it says "This means you're about to describe some text.". When it's next encountered, it says "This means you're done describing some text.". But that's not how it's meant in the above example. It's meant to be a part of the text we wish to describe. Because of this issue, the text is ended early- and the rest of the line doesn't make sense to the compiler, so it cries. An escape will solve this problem. When the compiler encounters <code>\"</code> as part of text, then it says "Aha, because you escaped it, I know this means you actually want the double quote character to be part of the text you wished to describe, instead of to end the text description". Now the code makes sense to the compiler, and everything is fine. </p><div class="well"><code>
+#include &lt;iostream&gt;<br/>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; &quot;This is the \&quot; character&quot;;<br/>
+}<br/>
+</code></div><p>
+This slight alteration makes the code perfectly valid and outputs what you would expect, but without the backslash. This leads to the entertaining situation where backslashes have to be themselves escaped, if you don't wish them to introduce an actual escape. For example, how would you output a single backslash? And when you start using more than one, it becomes a real mess. </p><div class="well"><code>
+#include &lt;iostream&gt;<br/>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; &quot;\\\n\\\\\\\\&quot;\\\&quot;\\&quot;;<br/>
+}<br/>
+</code></div><p>
+Now quicklike, is that program valid or not, and if it is, what does it output? This is the reason why C++11 introduced raw literals. But we'll deal with them another day. <br/>
+<br/>
+Exercise: What are the other escapes, and what effect do they have?<br/>
+</p>
+<ul class="pager">
+  <li class="previous">
+<a href="HelloWorld.html">&larr; Hello World</a>
+  </li>
+  <li class="next">
+<a href="Variables.html">Variables &rarr;</a>
+  </li>
+</ul>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

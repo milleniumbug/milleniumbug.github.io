@@ -1,0 +1,39 @@
+
+
+
+
+<p>
+Hungarian Notation is a particularly nasty form of evil. The fundamental purpose of Hungarian Notation is to note semantics in names. There are two forms and they're both equally bad. For example, you might find</p><div class="well"><code>
+int* pi_var;<br/>
+</code></div><p>
+Here, we use <code>p</code> to indicate that it's a pointer, and <code>i</code> to indicate that it's to an int. Immediately, we can see that this violates DRY in a nasty way- if we changed the type of <code>pi_var</code>, we'd have to change it's name <i>everywhere</i>. In addition, it's unusable when you <i>don't know</i> the type of a variable, say, through generic coding. Consider, also, this example of a Microsoft typedef</p><div class="well"><code>
+LPDIRECT3DDEVICE9 p;<br/>
+</code></div><p>
+Here, the type name clearly indicates that it's a pointer through the <code>LP</code> prefix- not that <code>IDirect3DDevice9*</code> <i>doesn't</i> clearly indicate that. You can see it throughout the C and, a little less, in the C++ Standard. When you see <code>std::size_t</code>, this indicates that it's a type, not a struct/enum/whathaveyou. This is effectively the same.<br/>
+<br/>
+This form of Hungarian Notation essentially addresses the problem that your coding environment is poor and won't tell you useful things like the type of a variable quickly (and your code is too complex to understand). However, in the field of modern coding where advanced development environments are common, it's redundant, highly verbose, and resistant to maintenance. <br/>
+<br/>
+The other form of Hungarian Notation is typeless- namely, it is used to encode semantics that really should be encoded through the type system, but aren't. Take, for example, HTML validation. When you create a post on a bulletin board, you <i>could</i> enter JavaScript content, which would then be parsed by the viewer's browser, creating an XSS (cross-site scripting) vulnerability. To prevent this, whenever you post, a script runs which swaps out HTML characters for their encoded forms. But which strings are encoded and which are not? So we invent a <code>unsafe_</code> prefix for the variables which haven't been encoded.</p><div class="well"><code>
+std::string OK = &quot;&lt;script&gt; stuff &lt;/script&gt;&quot;;<br/>
+std::string unsafe_string = GetPostContentFromDatabase();<br/>
+std::cout &lt;&lt; OK;<br/>
+std::cout &lt;&lt; encode(unsafe_string); // We know it has to be encoded because unsafe_ prefix.<br/>
+</code></div><p>
+However, it's clear to see that if we, instead, simply created another string type for the unsafe strings, we could guarantee proper validation through the compiler type checking, and skip having to prefix our variables with <code>unsafe_</code> just to indicate which contain unencoded HTML and which do not. </p><div class="well"><code>
+struct unsafe_string {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::string base;<br/>
+public:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;operator std::string() const {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return encode(base); <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;// etc<br/>
+};<br/>
+std::string OK = &quot;some html&quot;;<br/>
+unsafe_string str = GetPostContentFromDatabase();<br/>
+std::cout &lt;&lt; OK &lt;&lt; str; // No explicit encode call required- compiler inserts it for us.<br/>
+</code></div><p>
+<br/>
+Another common example of this is members- frequently, they are prefixed with <code>m_</code> to indicate that they are a member variable. However, fundamentally, this exposes that our names are too generic, or our classes/member functions are too big, because the names should not clash- not to mention that you could always use <code>this-&gt;</code> to explicitly access a member variable.<br/>
+</p>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

@@ -1,0 +1,67 @@
+
+
+
+
+<h1>Lambdas</h1>
+<p>
+A lambda function is a special function object which is created by the compiler which can access local variables- either by copying them or referencing them (careful of lifetime). Lambda functions are <i>expressions</i>. Note that every lambda has a distinct type. Lambdas are introduced with a pair of square brackets. The contents of these brackets dictate the interaction of the lambda with the local variables around it.</p><div class="well"><code>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;int i = 0;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;auto x = [&] // Capture by reference any local variables used<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;{<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; i;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;};<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;x(); // Prints 0<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;i = 10;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;x(); // Prints 10<br/>
+}<br/>
+</code></div><p>
+The key to understanding lambdas is to understand the translation the compiler performs. The above could be rewritten</p><div class="well"><code>
+class __compiler_internal_class {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;int& i;<br/>
+public:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;__compiler_internal_class(int& iarg)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: i(iarg) {}<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;void operator()() const {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; i;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br/>
+}; <br/>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;int i = 0;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;auto x = __compiler_internal_class(i);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;x(); // etc<br/>
+}<br/>
+</code></div><p>
+As such, lambdas are an important and very useful shorthand. And they can be used directly. Given our previous definition of bubblesort with a custom comparator, we can see</p><div class="well"><code>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::vector&lt;int&gt; x;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;// fill x<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;bubble_sort(x.begin(), x.end(), [](int lhs, int rhs) {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return lhs &gt; rhs;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;});<br/>
+}<br/>
+</code></div><p>
+This has the advantage that the lambda's logic is written directly where it's needed, and can make quick and easy use of local variables without requiring many lines of boilerplate code. Many or most of the Standard algorithms have extension points like this for maximal flexibilty. You can capture by value by using <code>[=]</code> instead of <code>[&]</code>. In addition, you can capture <i>specific</i> variables by the other mechanism- e.g., <code>[=, &i, &x]</code> or <code>[&, =f]</code>. Lambdas which consist entirely of <code>return expression;</code> have their return types automatically deduced. But for lambdas that don't specify and don't qualify for deduction, the compiler assumes <code>void</code>. In addition, you can only miss off the argument parenthesis if you have a <code>void</code> or deduced return type <i>and</i> no arguments. Else, they must be provided- even if empty.</p><div class="well"><code>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;auto x = [] { // deduced return and no arguments, no problem<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return 5;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;};<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;auto x2 = [=] {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;int i;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return x(); // Compiler cries- it thought return was void<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;};<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;auto x3 = []() -&gt; int {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;int z;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return 5;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;}; // valid<br/>
+</code></div>
+<ul class="pager">
+  <li class="previous">
+    <a href="Functors.html">&larr; Functors</a>
+  </li>
+  <li class="next">
+    <a href="Functional.html"><code>std::function</code> &rarr;</a>
+  </li>
+</ul>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

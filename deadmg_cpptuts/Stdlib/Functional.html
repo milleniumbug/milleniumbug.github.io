@@ -1,0 +1,43 @@
+
+
+
+
+<h1><code>std::function</code></h1>
+<p>
+Previously, I stated that each lambda has a unique type- as does each functor type you create, and each bind result. This means that you'd be a bit sunk when it comes to storing an unknown function object in a class- after all, you can't know it's type.</p><div class="well"><code>
+class X {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;??? func;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::vector&lt;int&gt; x;<br/>
+public: <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;void sort() { std::sort(x.begin(), x.end(), func);<br/>
+};<br/>
+</code></div><p>
+Hence, we will meet the library class <code>std::function</code>. The purpose of <code>std::function</code> is to alleviate this problem. Wherever a template can't be used to provide function object abstraction, <code>std::function</code> fits the bill. <code>std::function</code> takes a template parameter indicating the signature (the return and argument types) of the function objects it can hold. It can then be called, to call the held object.</p><div class="well"><code>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::function&lt;void()&gt; func; // Takes nothing, returns nothing.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;func = [] { std::cout &lt;&lt; &quot;In ur lambda&quot;; };<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;func(); // Prints &quot;In ur lambda&quot;.<br/>
+}<br/>
+</code></div><p>
+A <code>std::function</code> may be constructed from, or have assigned to it, any object that meets the requirements. These currently are copyable, and callable with the given signature. That means lambdas, bind results, and arbitrary functors. Of unfortunate note is how this interacts with overloading.<br/>
+  </p><div class="well"><code>
+void f(std::function&lt;void()&gt; func);<br/>
+void f(std::function&lt;int()&gt; func);<br/>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;f([] { return 5; }); // Ambiguous!<br/>
+}<br/>
+</code></div><p>
+This occurs because <code>std::function</code> of all types may be constructed via a templated constructor- so both <code>std::function</code>s are an equally good match, even though the <code>void()</code> one obviously could not work. The Standard does not require, but it is possible to use a technique called SFINAE to resolve this problem and allow the above call to compile. Hopefully in the future implementations will employ it. <br/>
+<br/>
+Thus, it's about time for an introduction to perfect forwarding, SFINAE, variadic templates, <code>typename</code> and <code>template</code>, type traits, and template meta-programming in general, not necessarily in that order.<br/>
+</p>
+<ul class="pager">
+  <li class="previous">
+    <a href="Lambdas.html">&larr; Lambdas</a>
+  </li>
+  <li class="next">
+    <a href="../TMP/index.html">Template Metaprogramming &rarr;</a>
+  </li>
+</ul>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

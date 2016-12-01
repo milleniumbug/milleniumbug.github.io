@@ -1,0 +1,34 @@
+
+
+<h1>Undefined Behaviour</h1>
+<p>Previously, I said that overflowing an integer is undefined behaviour (UB). There are <i>many</i> ways to get undefined behaviour in C++.</p>
+<div class="well"><code>
+#include &lt;limits&gt;<br />
+#include &lt;iostream&gt;<br />
+int main() {<br />
+&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; std::numeric_limits&lt;int&gt;::max() + 1;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;// Get the maximum value of an int, and go over it. UB.<br />
+}
+</code></div>
+<p>Undefined behaviour is what you get when the Standard does not require an implementation to behave in any way. This generally means &quot;Very bad things happen&quot;. If you are lucky, your program will crash, or a debug assertion will trigger. If you are not lucky, it will overwrite your hard drive- or send the &quot;Fire&quot; signal to those nuclear warheads, or anything, at all, ever. It is commonly referred to as &quot;Nasal demons&quot, because a C++ implementation may cause demons to come flying out of your nose if you invoke UB.</p>
+<div class="well"><code>
+int main() {<br />
+&nbsp;&nbsp;&nbsp;&nbsp;int* p = nullptr;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;int x = *p; // Dereference nullptr- UB.<br />
+}
+</code></div>
+<p>The key problem with UB is that the effect can be literally anything- including that your program appears to function like normal. This means that it is impossible for any test to prove the non-existence of UB. It's all too common for newcomers to attempt to show that something is fine by simply running it on their compiler and getting a good output. This is, unfortunately, meaningless. In fact, it's common for older codebases to have UB in them which is mostly harmless- until their compiler vendor issues a new version and everything explodes.</p>
+<p>The C++ Standard is not the only place which defines the behaviour of your program. It is (normally) lowered into an assembly language for execution. That language also has rules. For example, in x86 assembly language, signed integer overflow is not UB at all. This means that, in practice, a C++ program compiled for x86 which overflows a signed integer <i>probably</i> won't observe any hard-drive-formatting. In addition, the rules of the operating system mean that it <i>probably</i> won't start overwriting the memory of other programs, and if it tried to format the hard drive, the operating system would probably intervene. Probably. Some implementations explicitly define behaviour which the Standard does not.</p>
+<p>Unfortunately, that's not the end of the bad news where UB is concerned. From the perspective of a compiler, then &quot;broken optimization&quot; is a fine outcome for UB. This effectively means that the compiler can assume UB to be impossible and optimize on that basis. This means that if you accidentally invoke UB which the compiler figured out at compile-time, you can end up with sections of your source code that were simply deleted by the compiler without ever telling you, to save instruction cache. For example, there was a bug in the Linux kernel where UB would occur, so the compiler removed a code path which checked if a process had permission to perform an important action, yielding a security hole. This bug existed for years before being caught by improved compiler warnings.</p>
+<p>The moral of the story is, UB causes some seriously nasty headaches and problems. A C++ programmer who values his time and sanity should avoid anything that's UB like the plague, unless his C++ implementation explicitly allows it. This is not generally a problem, but if you get UB where you thought you were covered, the results are painful.</p>
+<p>Exercise: This exercise is undefined.</p>
+<ul class="pager">
+  <li class="previous">
+    <a href="Integers.html">&larr; Integers</a>
+  </li>
+  <li class="next">
+    <a href="FlowControl.html">Flow Control &rarr;</a>
+  </li>
+</ul>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

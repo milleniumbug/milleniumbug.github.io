@@ -1,0 +1,66 @@
+
+
+<h1>Templates</h1>
+<p>In short, a template is similar to a function, except it is called at compile-time. This fundamentally means that it cannot be passed any value which cannot be known to the compiler- and there are strict rules as to exactly what does and does not fit here, which we will look at later. In addition, it can be passed interesting things that can't be passed as arguments to a normal function - primarily, types. They are used to create types or functions from a common basis that can be used for many types.</p><div class="well"><code>
+template&lt;typename T&gt; T read() {<br/>
+</code></div><p>
+This defines a <i>function template</i>. After <code>typename T</code> is read by the compiler, <code>T</code> may be used as a type. It will be substituted by the compiler at the call site by whatever type we choose to pass it. As such, <code>T</code> is a valid return type. After this, our function looks much the same as before, except where we previously had only <code>int</code>, now we are dealing with any type <code>T</code>. Importantly, <code>read</code> is a <i>function template</i>, and <code>read&lt;int&gt;</code> is a <i>function</i>- where <code>T</code> has been replaced by <code>int</code>.</p><div class="well"><code>
+&nbsp;&nbsp;&nbsp;&nbsp;T t; // Defines a variable, of some type T. <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; &quot;Please enter a value.\n&quot;;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;while(!(std::cin &gt;&gt; t)) {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; &quot;Could not determine value from input. Please enter again.\n&quot;;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::cin.clear();<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::cin.ignore(std::numeric_limits&lt;std::streamsize&gt;::max(), '\n');<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;return t;<br/>
+}<br/>
+</code></div><p>
+The call site must be modified a bit too. Template arguments are passed through a special syntax.</p><div class="well"><code>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;int i = read&lt;int&gt;(); // Calls read, where T is replaced with int.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::string x = read&lt;std::string&gt;(); // calls read, where T is replaced with std::string.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned short s = read&lt;unsigned short&gt;(); // you get the picture<br/>
+}<br/>
+</code></div>
+<p>This enables us to respect DRY by writing functions which can operate on any type if the logic is the same. Of course, "value" is not a particularly specific hint to the user as to what is expected, so in this case, we probably should allow read to take an extra argument to output a more helpful description of what we were looking for.</p>
+<p>Of note is that types are strictly that- just a type. People attempt to pass strings as a template parameter, and expect the compiler to convert it into the type with that name. It won't. It will just cry. There is no mechanism in C++ to obtain a type from a string, either at compile-time or run-time. You cannot defer type mechanics to run-time.</p>
+<p>The three key units of code re-use are the function, the class, and the template- it's worth getting to know all of these things well.</p>
+<h1>Type Inference</h1>
+<p>The more observant of us will have noticed that, in a much smaller way, we have violated DRY again in this sample code. When defining the variables, we stated their type- but we stated their type again when passing it to read. Whilst something like</p><div class="well"><code>
+short s = read&lt;int&gt;();<br/>
+</code></div><p>
+isn't strictly forbidden or necessarily bad, it's not something we really want most of the time- there's no point reading something only to convert it right away to something else. So we will introduce a new C++11 feature- <code>auto</code>. <code>auto</code> essentially means "The type of this variable is the type of the thing I initialized it with". It allows us to write</p><div class="well"><code>
+auto i = read&lt;int&gt;(); // The compiler knows that i is an int, because read&lt;int&gt; returns an int.<br/>
+</code></div>
+<p><code>auto</code> functions with any expression, not just templates. You can even be silly and do something like</p>
+<div class="well"><code>
+auto i = 5;
+</code></div>
+<p>
+For a simple example, the advantages are slim. But there are types which are a great pain to express, and <code>auto</code> is a big advantage in this case. To parallel <code>auto</code>, we will also meet <code>decltype</code>. <code>decltype</code> is a beast similar to <code>auto</code>, in that the compiler gives us the type of an expression. But instead of being used to initialize a variable, it provides us with a type, which we can use as a template parameter.</p><div class="well"><code>
+auto i = read&lt;int&gt;();<br/>
+auto x = read&lt;decltype(i)&gt;(); // calls read with the type of i, as an argument.<br/>
+</code></div>
+<p>Template arguments can also be inferred, where you pass an object of that type or one constructed from that type as an argument. We will go into the details of this process later, but it is the same as <code>auto</code>. In fact, <code>auto</code> is specified to be identical.</p>
+<div class="well"><code>
+template&lt;typename T&gt; void f(T t) {<br />
+&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; t;<br />
+}<br />
+int main() {<br />
+&nbsp;&nbsp;&nbsp;&nbsp;f(5);<br />
+&nbsp;&nbsp;&nbsp;&nbsp;f("Hello.");<br />
+}</code></div>
+<p>Notice that there is no need to explicitly specify the type of T. We will next meet complex types- <code>const</code> and references. Traditionally, template parameters are simply named T, and a type named T is usually assumed to be a template parameter or arbitrary type if not stated otherwise in sample code- much like how loop indexes are traditionally named i,j,k.<br/>
+<br/>
+Exercise: <code>read</code> can't be given <i>every</i> type as a type T. What type can you find that will make the compiler cry, and can you figure out what the error means?<br/>
+</p>
+<ul class="pager">
+  <li class="previous">
+    <a href="Functions.html">&larr; Functions</a>
+  </li>
+  <li class="next">
+    <a href="References.html">References &rarr;</a>
+  </li>
+</ul>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

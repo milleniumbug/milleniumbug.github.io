@@ -1,0 +1,59 @@
+
+
+
+
+<p>
+Function pointers are another kind of pointer. They point to, well, functions. The syntax for a function pointer is what we've seen with <code>std::function</code>, but with <code>(*name)</code> in the middle.</p><div class="well"><code>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;void (*fp)();<br/>
+</code></div><p>
+Yes, that really does declare a variable/argument. Imagine what you get if that function pointer returns another, or returns a pointer to an array, or a pointer to a function pointer, or, well, it's best not to think about it. Function pointers are what C did, since templates and <code>std::function</code> don't exist in C.<br/>
+<br/>
+Function pointers can be created from functions.</p><div class="well"><code>
+void f() {}<br/>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;void (*fp)() = f;<br/>
+</code></div><p>
+You can call function pointers directly.</p><div class="well"><code>
+&nbsp;&nbsp;&nbsp;&nbsp;f(); // OK<br/>
+</code></div><p>
+But here's an interesting artifact- when you dereference a function pointer, you get a function- which immediately decays <i>back</i> into a function pointer.</p><div class="well"><code>
+&nbsp;&nbsp;&nbsp;&nbsp;(******************fp)(); // wat<br/>
+}<br/>
+</code></div><p>
+The important thing to know about function pointers is that they can be functions, more functions, and only functions. Instantiations of function templates, or static member functions also count. But no member functions, no function objects, no lambdas, no nothing. You cannot convert any kind of member or stateful function to a function pointer. Lambdas <i>can</i> be converted to a function pointer as long as they capture nothing. This means that if you have a legacy C function which takes a function pointer and you want to pass a stateful function to it, you have only three choices.<br/>
+<br/>
+The first is the <code>void* arg</code> idiom. Even in C it was recognized that this was a problem, and most C APIs which deal with function pointers allow for a <code>void*</code> argument- where the function taking the function pointer takes a void pointer, which is simply passed on to the function pointer. This can be used for a pointer to, say, a class instance, <code>std::function</code>, or whatever. For example,</p><div class="well"><code>
+void f(void(*fp)(void*), void* p) {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;fp(p);<br/>
+}<br/>
+void mah_func(void* p) {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;reinterpret_cast&lt;my_class*&gt;(p)-&gt;func();<br/>
+}<br/>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;my_class m;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;f(mah_func, &m);<br/>
+}<br/>
+</code></div><p>
+This is common but not global. Another solution is the "throw up" hack. This is the most generic of the solutions, but also the most disgusting. It abuses exceptions.</p><div class="well"><code>
+void f(void(*fp)()) { fp(); }<br/>
+void mah_func() { <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;try { <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;throw; <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;} catch(my_class* m) {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;m-&gt;func();<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br/>
+}<br/>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;my_class m;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;try {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;throw &m;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;} catch(my_class* p) {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;f(mah_func);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br/>
+}<br/>
+</code></div><p>
+Amazingly, this is actually well-defined behaviour. But it's a rather nasty abuse. Finally, you can use a thread-local stack of objects, which you can globally access. The problem is knowing what type the stack should be of, and <code>thread_local</code> support right now is not the best. If you were super desperate, you could grab a JIT library like LLVM and JIT a thunk. But that requires a huge library, and is reserved for the truly desperate.<br/>
+</p>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

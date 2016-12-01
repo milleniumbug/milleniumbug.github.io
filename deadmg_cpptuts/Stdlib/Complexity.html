@@ -1,0 +1,68 @@
+
+
+
+
+<h1>Algorithmic Complexity</h1>
+<p>Algorithmic complexity is an important subject to know and remember. An algorithm is a mathematical function that takes in some arguments, and returns some values. However, algorithms tend to be different from our 
+    regular functions in that they transcend the language of writing or specific implementations- they are a mathematical idea, translated into source code. Most functions we write could be considered algorithms. The 
+    complexity of an algorithm is a measurement of how much of some resource, usually time or space, it requires to execute, compared to an attribute of the input. For example, when I said that indexing into a 
+    <code>std::vector</code> was very fast, we say it is <code>O(1)</code>- that is, it has no relation to the size of the vector. For any N-sized <code>vector</code>, indexing will always take the same time. However, 
+    erasing or inserting a value from the middle of the <code>vector</code> is <code>O(n)</code>. This means that for an n-sized <code>vector</code>, it will take in the worst case n operations to erase from the middle. 
+    Generally speaking, algorithms are rated in terms of the worst-case time (O) in relation to the size of the input (n). However, you can also see <code>O(n)</code> space, for example, or even comparisons or swaps or 
+    almost any measurable quantity. But unqualified measurements are always time related to input size, where the size is n.
+</p>
+<p>Also note that algorithmic complexity is about the big picture. Here, we describe only the <i>largest</i> term, and only as it relates to the input variables. Thus, <code>O(2n)</code> = <code>O(n)</code>, because the 
+    2 is a constant. <code>O(n + log(n))</code> is <code>O(n)</code>, because <code>n</code> is the largest term relating to <code>n</code>. These lesser terms and additional constants can impact the real run-time of an 
+    algorithm. However, in the general case, an algorithm with lower complexity is faster than an  algorithm with higher complexity. Here are the complexities for some common operations:</p>
+<div class="well"><code>
+sort: O(n*log(n))<br/>
+lookup/erase unordered_map/set: O(1)<br/>
+lookup/erase map/set: O(log(n))<br/>
+erase from middle of vector/deque: O(n)<br/>
+erase from end of vector/deque: O(1)<br/>
+push_back to vector: Amortized O(1)<br/>
+erase from or insert into anywhere in list: O(1)<br/>
+</code></div>
+<p>Amortized is where the operation is averaged. For <code>vector</code>, every <code>n</code> operations, the memory block has to resize- involving copying <code>n</code> items. Else, it is <code>O(1)</code>. So here, we 
+    can say that <code>push_back</code> takes, on average, <code>O(1 + (n/n)) = O(1 + 1) = O(1)</code>. This means that <code>push_back</code> can claim amortized <code>O(1)</code>- as long as the vector's capacity grows 
+    at an exponential rate. Note that amortized is not a sense of "the average operation", it is the worst-case complexity over several operations. Proving an amortized complexity means proving how many operations have 
+    what complexity.
+</p>
+<p>When describing or implementing an algorithm, algorithmic complexity is one of the most important properties. A lower complexity can turn a task from impossible to trivial. Remember our recursive <code>fib</code> 
+    function? It is unbearably slow for large values. That is because it's runtime is exponential- <code>O(phi^n)</code>, where <code>phi</code> is a constant <code>(~1.6)</code>. However, we can also use a different 
+    implementation.</p>
+<div class="well"><code>
+int fib(int n) {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;if (n == 0 || n == 1) return 1;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;int value1 = 1;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;int value2 = 1;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;int value3;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;for(int i = 1; i &lt; n; i++) {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;value3 = value2 + value1;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;value1 = value2;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;value2 = value3;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;return value3;<br/>
+}
+</code></div>
+<p>This implementation runs in just <code>O(n)</code>, where <code>n</code> is the value of the input, making it feasible to calculate virtually any value of the sequence. Imagine calculating fib(10000). Recursive fib 
+    will arrive in an answer in, at worst, directly proportionate to 7.5x10^2089. Even if that was just one cycle each and you parallelised it to every computer in existence, you're still talking about "After the heat 
+    death of the universe" timeframes here. In contrast, our iterative fib will compute the value in directly proportionate to 1x10^5 operations. That's 7.5x10^2084 times faster. 1x10^5 is nothing compared to the 3x10^8 
+    clocks per second, roughly, of most CPU cores, let alone instruction-level parallelism, multiple cores, etc. This means that our iterative solution can arrive at such an answer trivially fast. As you can see, an 
+    order of magnitude would be a speck of dust in the Sahara Desert compared to the differences in these complexities- and it only gets worse as N increases. As N approaches infinity, the savings from a lower-complexity 
+    algorithm also approaches infinity.
+</p>
+<p>Conversely, however, the difference gets better as N decreases. As you may have noticed, the reality is that the complexity states nothing about the constant overhead. For such an extreme difference, there's basically 
+    no way the recursive solution could ever come up faster for any N. However, when comparing complexities like O(N) vs O(N * log(N)), it is quite feasible, and constant overheads can make or break algorithms. We will 
+    see examples of this later on.
+</p>
+<ul class="pager">
+  <li class="previous">
+    <a href="SharedPtr.html">&larr; <code>std::shared_ptr</code></a>
+  </li>
+  <li class="next">
+    <a href="Sort.html"><code>std::sort</code> &rarr;</a>
+  </li>
+</ul>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

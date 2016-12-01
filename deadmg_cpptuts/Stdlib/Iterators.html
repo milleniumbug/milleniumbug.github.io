@@ -1,0 +1,41 @@
+
+
+
+
+<h1>Iterators</h1>
+<p>
+As you've noticed, the containers are intended to be as similar as possible. Here, we will meet the most significant way in which that is achieved- iterators.<br/>
+<br/>
+An iterator is a type similar to a pointer. You can de-reference it and it will return, usually a reference, to the container's contents. All containers have iterators, although they differ in some ways. You can even get custom iterators that perform special functions, and the Standard lib provides many iterators. The iterator range is defined as [begin, end). This means that the end is exclusive but the beginning is inclusive. Now we will see a new way to iterate over a <code>vector</code>:</p><div class="well"><code>
+for(auto it = vec.begin(); it != vec.end(); ++it) {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; *it;<br/>
+}<br/>
+</code></div><p>
+We use <code>*it</code> to gain the current element, and <code>++it</code> to look to the next element. The <code>vec.end()</code> function returns the iterator one past the last element. If our current iterator is equal to this iterator, we know we've reached the end and it's time to break the loop, as de-referencing this iterator would be UB.<br/>
+<br/>
+The primary notable point here is that this is valid where <code>vec</code> is <i>any</i> Standard container- <code>list</code>, <code>map</code>, <code>unordered_set</code>, the works. This makes it fairly easy to write code that works on any Standard container. Iterating over a single container directly is common enough that the language has a specific syntax for it.</p><div class="well"><code>
+for(auto x : vec) {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; x;<br/>
+}<br/>
+</code></div><p>
+This is based on iterators- in fact, it's a simple transformation from our previous code to this code. If you want to take by reference, you can use <code>auto&</code>. For containers like <code>list</code>, <code>deque</code>, or <code>vector</code>, <code>x</code> is the contained value. For associative containers like <code>map</code> and <code>unordered_map</code>, then <code>x</code> is a <code>std::pair&lt;const K, V&gt;</code>. We haven't met <code>std::pair</code> yet, but it is a simple convenience type for holding two objects. You can use <code>x.first</code> to get the first item and <code>x.second</code> to gain the second.</p><div class="well"><code>
+for(auto x : map) {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; &quot;Key: &quot; &lt;&lt; x.first &lt;&lt; &quot; Value: &quot; &lt;&lt; x.second;<br/>
+}<br/>
+</code></div><p>
+Iterator invalidation rules are, for most containers, the same as the pointer invalidation rules. However, some like <code>unordered_map</code> and <code>deque</code> have different rules for pointers and iterators. It's worth knowing the iterator rules for whatever container you end up using.<br/>
+<br/>
+Iterators allow us to write functionality that can operate regardless of where the data is stored. This makes writing some classes of function much easier- for example, you can <code>sort</code> a <code>vector</code> <i>or</i> a <code>deque</code> with the same function- <code>std::sort(cont.begin(), cont.end());</code>. <code>std::sort</code> lives in <code>&lt;algorithm&gt;</code>. There are many other algorithms in that header for our use.<br/>
+<br/>
+There are several types of iterator- input, output, forward, bidirectional, and random-access. These names refer to the functionality offered by the iterator. All iterators can be de-referenced, incremented, and copied, but bidirectional iterators can also be decremented, and random-access iterators support addition and subtraction to move arbitrary amounts forward and backward. Some algorithms require certain categories- for example, <code>std::sort</code> requires random access.</p>
+// Todo: Dafuq, exactly, can you do with input/output iterators?
+<ul class="pager">
+  <li class="previous">
+    <a href="List.html">&larr; <code>std::list</code></a>
+  </li>
+  <li class="next">
+    <a href="UniquePtr.html"><code>std::unique_ptr</code> &rarr;</a>
+  </li>
+</ul>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

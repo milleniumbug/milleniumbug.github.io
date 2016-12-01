@@ -1,0 +1,28 @@
+﻿
+
+
+
+
+<h1>CPU Modes</h1>
+<p>The CPU upon which you run actually has several potential modes of operation. Most of them are not of interest, but there are two which we are concerned with here- "user mode" and "kernel mode". In essence, the 
+    operating system runs in "kernel mode" and applications run in "user mode". Kernel mode programming is significantly less forgiving than usermode programming. The general advantage of user-mode is that, except 
+    operating system bugs, no application can bring down the system, because the only way to access any resource is through the operating system. Some programs, especially hardware drivers, must operate in kernel 
+    mode to perform their tasks. It is significantly more dangerous to install an untrusted driver than an untrusted application for this reason. Microsoft estimates that a large majority of Windows crashes come 
+    from bad hardware drivers.
+</p>
+<p>However, in order to achieve this goal, many instructions, like I/O, are forbidden from user-mode programs. The processor must switch into kernel-mode and execute some kernel-mode code to perform these goals. 
+    This switch is known as a "context switch" and it is nasty expensive. Most operations that involve acquiring some hardware resource involve context switching, like allocating more virtual memory (not the same 
+    as allocating more memory), creating threads, or performing I/O. Thus, it is always wise to limit your use of these resources. In addition, as these are system-wide resources, it often involves synchronization,
+    which can be a nasty additional cost. This implies that for resource functions where you can ask for lots in one call, it's best to do so- for example, reading I/O or allocating memory in large chunks.
+</p>
+<p>Of note is also that each CPU mode has it's own pointer size. You cannot mix code with different pointer sizes. Most code should recompile for a different size without an issue, but it has to be recompiled- an x86 DLL 
+    cannot be loaded by an x64 process. However, through some trickery, you can create "host processes" of that word size and then use inter-process communication to handle it. The OS kernel also has a translation layer 
+    so that a 32bit process can call into a 64bit kernel- a 64bit CPU and OS would be useless if it could not run 32bit programs.
+</p>
+<p>Finally, the OS scheduler regularly interrupts all user-mode programs. Typically, CPU time is given out in slices. This is called a "thread quanta", as each thread executes for exactly that much time (barring 
+    explicit blocking calls). Then the OS scheduler interrupts again. This means that the OS can always schedule itself or other programs to run, no matter what any given program is doing. In addition, the OS can 
+    and will take a program that used to be running on one core and move it to another.
+</p>
+
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

@@ -1,0 +1,27 @@
+
+
+
+
+<p>
+An unhelpful string is an array of <code>char</code>. The array's last element is always zero. The critical points to notice here are that it has no knowledge of how it was allocated, or how to deallocate it if necessary- and indeed, memory management of unhelpful strings is always manual. In addition, you must always manually manage the 0 terminator, with all the error-prone awful that implies. Hopefully, all the C++ you'll see uses <code>std::string</code> or a Unicode string class, but to permit easier understanding of old code which still uses unhelpful strings (or as they are commonly also known, C strings), we will see some samples.</p><div class="well"><code>
+int strlen(const char* src) {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;int len = 0;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;while(*src++ != '\0')<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;len++;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;return len;<br/>
+}<br/>
+</code></div><p>
+Simply returns the length of a C string, by iterating through it until the 0 terminator is reached. This function is packaged for you, with others, in <code>&lt;cstring&gt;</code>. Also notice that while the loop might be better expressed as a <code>for</code> loop, it's a C thing to do to package everything in as little as possible code- even if the other code is easier understandable. This is also expressed in the name of the function, <code>strlen</code>. <code>&lt;cstring&gt;</code> also has a number of other C string handling functions. In companion to these functions, you will also need to meet <code>malloc</code> and <code>free</code>. These are the equivalent of <code>new</code> and <code>delete</code>. <code>malloc(size)</code> allocates a <code>size</code> sized block of memory, and <code>free</code> frees it. Note that this does not involve calling constructors or destructors, as C doesn't have those concepts.<br/>
+<br/>
+The things to bear in mind are:<br/>
+<br/>
+- Raw C-string handling involves lots of pointer manipulations- all squeezed into as few characters as possible.<br/>
+- Always convert a C string to <code>std::string</code> or the Unicode class of your choice as soon as possible.<br/>
+- Use the provided conversions, e.g. <code>c_str()</code>, to interface with C APIs.<br/>
+- Remove any C string handling as soon as possible.<br/>
+<br/>
+<br/>
+<br/>
+</p>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

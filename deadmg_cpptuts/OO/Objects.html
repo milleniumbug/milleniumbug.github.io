@@ -1,0 +1,17 @@
+
+
+
+
+<p>
+An object holds two things- state, and functions which act upon that state. This defines <i>almost</i> everything in C++ as an object, except references. For example, a pointer holds some state (the address of the thing it points to) and a function you can call upon that state (to access that thing). Whilst it might appear counterintuitive that primitive types like <code>int</code> and <code>T*</code> are objects, especially since they existed long before object orientation as a programming paradigm and certainly never went anywhere near a <code>class</code> keyword, it's trivially provable that this is the case- namely, it is impossible to distinguish the interface of <code>int</code> and a class <code>Integer</code> that offers the same interface. By the same token, a lambda function is also an object. The equivalence here is exploited to write templates that are generic for any type with <code>operator()</code>- such as <code>std::sort</code>.<br/>
+<br/>
+Object orientation simply revolves around creating your own classes which hold their own internal state and provide their own functions. Unfortunately, good object-orientated design is not something that can be easily taught- a large proportion is simply gained from experience of failure. Fortunately, you can benefit from the failures of others- some are mine, but we can also see examples from third party libraries and the Standard itself- to get a quick leg up. In this section, we'll look at a number of classes and examine exactly how, and why, they don't work.<br/>
+<br/>
+The simple definition of a good class is one that it's hard or impossible to misuse, whose public interface is minimal, and reveals as few implementation details as possible.<br/>
+<br/>
+With respects to object orientation, there are two primary means of encapsulation. The first is to use the <code>private</code> and <code>protected</code> modifiers, which prevent outside code from depending on your implementation. The second is to simply write as much code as possible as a free non-friend function, because these functions also cannot depend upon your implementation. Most of the other goals apply directly.<br/>
+<br/>
+The first class we will look at is <code>std::string</code>. For the sake of this section, we will ignore Unicode, which is <i>another</i> massive problem with <code>std::string</code>, but not the one we're looking at right now.<br/>
+</p>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

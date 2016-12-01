@@ -1,0 +1,53 @@
+
+
+<h1>Integral Types</h1>
+<p>Integral types represent exact integer values using a binary encoding scheme. This scheme is not specified by the C++ Standard, but virtually all CPUs that exist today use two's complement. It's not generally necessary to know exactly what two's complement is or how it works.</p>
+<p>Integer types can be constructed, used, and output, much like the string type we saw earlier. They also support integer operators- addition, subtraction, multiplication, and division. When an integer is divided, the remainder is truncated.</p><div class="well"><code>
+#include &lt;iostream&gt;<br/>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;int first = 5;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; first;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; &quot;\n&quot;;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;int second = 2;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;int whole = first / second;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; whole;<br/>
+}<br/>
+</code></div>
+<p>What's important to know is that for each integral type, the amount of memory is fixed at a certain width, which is typically a power of 2. Most implementations come with sizes which are 8, 16, 32, and 64 bits wide. This means that a signed integer type can represent from 2^(width - 1) to -2^(width-1) approximately, and unsigned are 0 to 2^width. To make an integral type unsigned, just add "unsigned" in front- e.g., <code>unsigned int</code>.</p>
+8bit +-127 (usually <code>char</code>)<br/>
+16bit +-65535 (usually <code>short</code>)<br/>
+32bit +- 4.3x10^9 (usually <code>int</code> and/or <code>long</code>)<br/>
+64bit +- 1.8x10^19 (usually <code>long long</code>)<br/>
+<p>As you can see, 32bit and 64bit integers can store virtually any integer you might have cause to use. The smaller encodings are generally used only when there's specific cause to save space.</p>
+<p>Unfortunately, the C++ Standard does not specify the widths of the built-in integer types. However, it does give some guarantees, and each platform is required to explicitly define the widths. For this introduction, we will use <code>int</code>. It is guaranteed to have at least 16 bits, and on almost all current platforms, is 32bit or even 64bit. This is more than wide enough for our introductory samples.</p>
+<p>Unsigned integers are defined to wraparound on overflow or underflow- that is, if you add 1 to an unsigned integer already representing it's maximum value, you will get 0, and if you subtract 1 from one representing 0, you will get the maximum value.</p>
+<p>Unfortunately, signed integers invoke undefined behaviour (UB, covered next) on overflow or underflow. In addition, if you attempt to read an integer of any type before assigning it a value, this is UB. </p><div class="well"><code>
+#include &lt;iostream&gt;<br/>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;int i;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; i; // UB!<br/>
+}<br/>
+</code></div><p>
+On the other hand, helpful strings always have a value.</p><div class="well"><code>
+#include &lt;iostream&gt;<br/>
+#include &lt;string&gt;<br/>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::string i;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; i; // No problem- outputs the empty string.<br/>
+}<br/>
+</code></div><p>
+This program outputs the empty string- not terrifically useful, but not UB.<br/>
+<br/>
+Exercise: What is the size of the integer types on your platform?<br/>
+<br/>
+</p>
+<ul class="pager">
+  <li class="previous">
+    <a href="Variables.html">&larr; Variables</a>
+  </li>
+  <li class="next">
+    <a href="UB.html">Undefined Behaviour &rarr;</a>
+  </li>
+</ul>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

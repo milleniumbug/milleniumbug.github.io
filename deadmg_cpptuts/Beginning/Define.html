@@ -1,0 +1,37 @@
+
+
+<h1><code>#define</code></h1>
+<p>
+<code>#define</code> is a very powerful mechanism. We will study only a very few of it's uses- almost all of them are highly inadvised and redundant in Modern C++.<br/>
+<br/>
+First, the include guard. Effectively, <code>#define</code> sets a global variable whose name you can choose. You can choose to set it <i>to</i> something or you can just mark it as set. The directive <code>#ifdef</code> processes the next chunk of file (until <code>#endif</code>) if that name is set. The parallel <code>#ifndef</code> processes the next chunk if the name is <i>not</i> set. The preprocessor also packs <code>#else</code>, with a use pretty similar to the language's <code>else</code> construct. The include guard takes the following form:</p><div class="well"><code>
+// some_header.h<br/>
+#ifndef SOME_NAME_UNIQUE_TO_THIS_HEADER<br/>
+#define SOME_NAME_UNIQUE_TO_THIS_HEADER<br/>
+// header contents<br/>
+#endif<br/>
+</code></div><p>
+When the header is included the first time, the macro will not be set. But it is set whilst processing the file body the first time. When the header is included the second time, the macro is set and the header's contents are skipped as a result. This prevents the compiler from ever seeing the header contents more than once in one translation unit, no matter how many times it includes the header. This is highly recommended practice. Many compilers also offer the extension <code>#pragma once</code> that achieves the same effect, but less messily (and with a couple of specific optimizations to the compilation process added).<br/>
+<br/>
+Like <code>#include</code>, <code>#define</code> is a textual pasting mechanism. For example, consider</p><div class="well"><code>
+#include &quot;some_header.h&quot;<br/>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;int SOME_NAME_UNIQUE_TO_THIS_HEADER;<br/>
+}<br/>
+</code></div><p>
+In this case, the preprocessor recognizes the macro and replaces it with what we set it to- in this case, nothing, and the compiler only sees <code>int;</code>. It's nice and obvious because I used an obvious name, but if it wasn't so obvious, then when this causes an error, it is extremely difficult to debug the problem if you do not know that the name is a macro. It is impossible to scope preprocessor macros or to otherwise restrict their effect. When macros begin to affect other parts of the code, it is called "macro leakage". Thus, it is important for macro names to be very distinct- conventionally, all capitals are used, and they are made as explicit as possible. However, do not gain the idea of placing underscores before your macro names. Any name which begins with an underscore and then a capital letter is reserved for the implementation- that is, using them anywhere, ever, in your own code is UB. In addition, any name beginning with two underscores is reserved for the implementation. The Windows header file <code>&lt;Windows.h&gt;</code> is notorious for macro leakage problems. You can explicitly unset problematic macros with <code>#undef</code>- but you have to know they're macros, first.<br/>
+<br/>
+The preprocessor does have some other useful tricks- but we don't need to encounter them just yet. Generally speaking, the preprocessor should only ever be used in situations of very dire need, when absolutely no other mechanism will do. This is because errors due to improper use can be extremely difficult to detect and debug.<br/>
+<br/>
+Exercise: Think about how much fun you can have with things like <code>#define true (std::rand() % 2)</code>.<br/>
+</p>
+<ul class="pager">
+  <li class="previous">
+<a href="Include.html">&larr; <code>#include</code></a>
+  </li>
+  <li class="next">
+<a href="Pointers.html"><code>Pointers</code> &rarr;</a>
+  </li>
+</ul>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

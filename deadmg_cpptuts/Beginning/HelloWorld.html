@@ -1,0 +1,49 @@
+
+
+<h1>Hello, World</h1>
+<p>
+The traditional opening program in any language is Hello, World. It prints the titular text. So without further ado,
+</p>
+<div class="well"><code>
+#include &lt;iostream&gt;<br/>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; &quot;Hello, World!&quot;;<br/>
+}<br/>
+</code></div>
+<p>
+However, depending on your environment, you may have run into a curious problem. The above program causes "Hello, World!" to be printed. But it doesn't cause the place where you printed it to continue to exist. If you execute this program in Visual Studio, and some other development environments, the console window will disappear before you could possibly have read the output. However, the problem of pausing a program is far more general than this. And so we introduce something called a "breakpoint". A breakpoint instructs an external tool, the debugger, to pause the program so that we can observe, and sometimes even modify, its state whilst executing. The exact sequence is specific to each debugging tool.<br/>
+<br/>
+Visual Studio: Add, after the semicolon, <code>__debugbreak();</code>. This will cause the debugger to pause your program.<br/>
+<br/>
+Clang/G++: These compilers execute on the command line (generally) and don't require this in this case. You can wait to look up breakpoints.<br/>
+<br/>
+Online: These compilers return the whole output as a web page, which doesn't have this problem. But then, they don't have debuggers, so I hope nothing ever goes wrong.<br/>
+<br/>
+You can have fun changing the output text to whatever you want.</p>
+<h1>Comments</h1>
+<p>In addition, we will introduce comments in this chapter. Comments are C++ source code that does not have any executable function and is not compiled. The compiler strips all comments before performing any other action on the source code. Thus, the author of the code leaves instructions or information about the surrounding code in them. In addition, they are used to remove code from the compiler which you may want to re-introduce easily.</p><div class="well"><code>
+#include &lt;iostream&gt;<br/>
+int main() {<br/>
+</code></div>
+<p>
+Single-line comments are introduced by a double forward slash. The comment lasts until the next line. You can enter any text in here.
+</p>
+<div class="well"><code>
+&nbsp;&nbsp;&nbsp;&nbsp;// This line does nothing. ¬!&quot;£$%^&*()_+{}~@:<br/>
+</code></div>
+<p>
+Multi-line comments are introduced by a forward slash and an asterisk. They are ended by an asterisk and a foward slash. Strictly, there is no need for them to be multi-line- they can be of arbitrary size and position.</p><div class="well"><code>
+&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; /*&quot;Commented out&quot;*/ &quot;Not commented out&quot;;<br/>
+}<br/>
+</code></div>
+<p>Exercise: Some text sequences cause the compiler to fail. What are they?<br/></p>
+<ul class="pager">
+    <li class="previous">
+        <a href="../Preparation/CPP11.html">&larr; C++11</a>
+    </li>
+  <li class="next">
+<a href="Escapes.html">Escapes &rarr;</a>
+  </li>
+</ul>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

@@ -1,0 +1,57 @@
+
+
+
+
+<h1><code>std::map</code></h1>
+<p>
+All of the containers we have previously encountered could only be indexed- you could only look up the Nth element- if that. However, <code>std::map</code> addresses a slightly different problem- how you can access a value from something else. Thus, <code>std::map</code> takes two template type parameters- a key and a value. It allows arbitrary pairings of key and value. When you give <code>std::map</code> the key, it will give back to you the value in a pretty short time. You cannot access the Nth value of a <code>std::map</code> without explicitly iterating through it manually.</p><div class="well"><code>
+#include &lt;map&gt;<br/>
+#include &lt;iostream&gt;<br/>
+#include &lt;string&gt;<br/>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::map&lt;std::string, int&gt; intmap;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;intmap[&quot;Hello&quot;] = 2; // We can use [] to get and set the value, as before<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;// but here operator[] takes a key of the key type- not an integer.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;intmap[&quot;World&quot;] = 4;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; intmap[&quot;Hello&quot;];<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; intmap[&quot;Flub&quot;]; // Adds &quot;Flub&quot;, int() to the map implicitly.<br/>
+}<br/>
+</code></div><p>
+The other containers we have looked at did not have particularly interesting requirements for their functionality. Mostly just movable, with a small amount of default-constructible for some functions. This is virtually all types. However, <code>std::map</code> requires a little more. It requires a binary relation, <code>operator&lt;</code>, to be valid for the <i>key</i> type (the first template argument). This is defined for <code>std::string</code> so we don't need to worry about that here, but if you wish to <code>map</code> your own types, you must provide <code>operator&lt;</code>.<br/>
+<br/>
+Of note is that <code>map</code>'s key type is <code>const</code>. Previously, we didn't make much discussion of <code>const</code> because we didn't need it. However, <code>map</code> is one of the places where we do. <code>map</code>'s implementation depends on a specific relationship between key values. If you went off modifying them, you'd break everything. Thus, they are stored as <code>const</code>. It is up to you to define which operations are legal on a <code>const</code> type- but usually, comparing is legal. However, I did not tell you how to make an operation <code>const</code>, nor exactly what that does.</p><div class="well"><code>
+class my_type {<br/>
+public:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;bool operator&lt;(const my_type& other) const; // declaration<br/>
+};<br/>
+bool my_type::operator<(const my_type& other) const {<br />
+} // definition
+</code></div><p>
+The second const means that this operator can be called on <code>const</code> values. This also makes <code>this</code> (and <code>*this</code>) <code>const</code>. This is designed to be a safety net to ensure the correct usage of <code>std::map</code>.<br/>
+<br/>
+The binary relation is defined to be a strict weak ordering, or SWO. This means that if <code>a &lt; b</code>, then <code>b &lt; a</code> <i>must</i> be false. In addition, if <code>a &lt; b</code> is false and <code>b &lt; a</code> is false, then <code>a == b</code>. Unfortunately, there is no means to guarantee the correctness of the operator. However, relatively simply, the comparator on all types provided as Standard (for those which provide it) does follow the restrictions, except floating-point types and compound types like tuple which depend on them, where inf and NaN values can break the ordering, so the simplest implementation simply delegates to a member of your choice. This means it is impossible to make a <code>std::set&lt;float&gt;</code> which stores NaN. For multiple-member comparisons, you can use <code>std::tie.</code></p>
+<div class="well"><code>
+class C {<br />
+&nbsp;&nbsp;&nbsp;&nbsp;int x, y, z;<br />
+public:<br />
+&nbsp;&nbsp;&nbsp;&nbsp;bool operator&lt;(const C& other) const {<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return std::tie(x, y, z) &lt; std::tie(other.x, other.y, other.z);<br />
+&nbsp;&nbsp;&nbsp;&nbsp;}<br />
+};
+</code></div>
+<h1><code>std::set</code></h1>
+<p>
+Finally, we will meet <code>std::set</code>. It is similar to a <code>std::map</code>, except the key and value are the same. <code>std::set</code> can have any <code>T</code> inserted into it that meets the requirements of <code>std::map</code>'s key type. It guarantees uniqueness- that is, <code>std::set&lt;int&gt; x; x.insert(5); x.insert(5); std::cout &lt;&lt; x.size();</code> prints only 1, as there is only 1 distinct item in the set. Any given item is either present or not present in the set. You also cannot use <code>[]</code> notation to access a set- instead the <code>insert</code> and <code>erase</code> functions are used to add and remove values.<br/>
+<br/>
+When you take a pointer to a value stored inside a <code>std::map</code> or <code>std::set</code>, it can only be invalidated if that element is erased. It cannot be invalidated any other way.<br/>
+</p>
+<ul class="pager">
+  <li class="previous">
+    <a href="Tuple.html">&larr; <code>std::tuple</code></a>
+  </li>
+  <li class="next">
+    <a href="UnorderedMap.html"><code>std::unordered_{map|set}</code> &rarr;</a>
+  </li>
+</ul>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

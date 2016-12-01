@@ -1,0 +1,39 @@
+
+
+
+
+<p>
+In our previous example, I used <code>join()</code> to avoid a data race. A data race is where two or more threads compete for the same resource. More specifically, a data race occurs when more than one thread accesses an 
+    object at the same time, the operations are not atomic, and at least one thread is a writer. If this occurs, then UB.
+</p><div class="well"><code>
+#include &lt;future&gt;<br/>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;int i = 0;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::async([&] {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;i = i + 1;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;});<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; i;<br/>
+}<br/>
+</code></div>
+<p>What result is printed? Well, nobody really knows. It could be <code>0</code>, <code>1</code>, or pretty much anything. This is because we did not synchronize access to this variable. You see, both the primary thread 
+    (<code>main()</code>) and the other thread (<code>t</code>) attempt to use <code>i</code>. But since both execute in parallel, there isn't really a "first". <code>i</code> might hold any value. This holds no matter 
+    how many threads we spawn. In fact, this example is UB, as it is a data race. To fix this problem, we will make <code>i</code> <i>atomic</i>. Atomic means "indivisible", and each atomic operation is indeed indivisible. 
+    Each operation completes in its entirety in some order before any other atomic operation can take place. Note that using atomic ops does not guarantee the safety of any non-atomic ops.
+</p>
+<div class="well"><code>
+#include &lt;future&gt;<br/>
+#include &lt;atomic&gt;<br/>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::atomic&lt;int&gt; i(0);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::async([&] {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;i += 1;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;});<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; i;<br/>
+}<br/>
+</code></div><p>
+Now we have guaranteed that it is either <code>1</code> or <code>0</code>. Note that we did not use <code>i = i + 1</code>, but <code>i += 1</code>. This is an important distinction. When we do <code>i = i + 1</code>, this
+    is three operations- load i from memory, increment stored value, write stored value back to memory. Whilst we guarantee that the read and write are atomic with respect to other reads and writes, so there is no UB, 
+    there is nothing forcing them to be atomic with each other. In particular, another thread could access i after being read but before being written and set it to any old value. This shows an important conclusion- even 
+    if an operation is atomic or safe to call concurrently, this does <i>not</i> imply that a sequence of such operations is. They can be in some cases, but far from always.</p>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

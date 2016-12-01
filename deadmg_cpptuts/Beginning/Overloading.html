@@ -1,0 +1,54 @@
+
+
+<h1>Function Overloading</h1>
+<p>
+Previously, we met references, of both lvalue and rvalue types. Now it's time to meet one of the things that makes them truly useful- overloading.<br/>
+<br/>
+A <i>function overload</i> is a fairly simple principle. You have multiple functions, all with the same name. When you call these functions, the compiler works out which one you really meant to call from the argument types. If it can't figure it out, it cries. As you can imagine, if you don't have a clear idea of what the rules are (as they pertain to your situation), this can produce some confusing run-time or compile-time errors when the compiler picks the wrong overload- or can't choose.<br/>
+<br/>
+To begin with, the compiler will not pick overloads where the types are not a match. Given</p><div class="well"><code>
+void f(int& i) {}<br/>
+void f(int&& i) {}<br/>
+void f(std::string i) {}<br/>
+</code></div><p>
+The following calls are not ambiguous:</p><div class="well"><code>
+f(0); // Neither int& nor std::string want an integer rvalue.<br/>
+f(&quot;Hai&quot;); // Neither int& nor int&& want an unhelpful string.<br/>
+int i;<br/>
+f(i); // neither std::string nor int&& want an integer lvalue.<br/>
+</code></div><p>
+But it is possible to create ambiguous overloads. Consider what happens when</p><div class="well"><code>
+void f(long i) {}<br/>
+void f(long long i) {}<br/>
+</code></div><p>
+As a quick refresher, we met <code>long</code> and <code>long long</code> as integral types. Now, when we call</p><div class="well"><code>
+f(42);<br/>
+</code></div><p>
+The compiler cries. Why is this? <code>42</code> is of type <code>int</code>. Now both <code>long</code> and <code>long long</code> are bigger than <code>int</code>, so this conversion is perfectly fine and safe. But which to choose? Both would be equally as good. Unfortunately, because they're equally as good, the compiler gets confused and cries. The exact rules which govern overload resolution are complex, but the general advice is to remember that your callers are going to be trying to figure out which overload is which too, and writing an overload set that you need a copy of the Standard to decide which overload is picked is a bad thing to do, because it's going to be hard for your callers. Thus, most real sets of overloaded functions have a clear winner for a given argument set, or are clearly ambiguous. <br/>
+<br/>
+Generally speaking, the compiler will eliminate overloads that produce type mismatches, it will prefer not to call a template when possible, it will prefer conversion sequences defined by the Standard (like <code>int</code> being converted to <code>long</code>) over conversions defined by the user (including <code>std::string</code> from unhelpful string, in this case), and it will prefer to exactly match types when it can (reference binding is an exact match).</p>
+<h1><code>const</code></h1>
+<p>
+The next issue we need to look at is <code>const</code>. In brief, <code>const</code> is the idea that an object cannot be modified. In the case of a <code>const</code> reference, that object cannot be modified <i>through that reference</i>. It could be altered through others. A <code>const</code> lvalue reference can bind to rvalues as well as lvalues. They are usually used to refer to anything without copying it. <code>const</code> is also used to enforce immutability on some objects where mutating them would break program semantics. <code>const</code> rvalue references do exist but there's no point in using them, nor any point in <code>const</code> rvalues.</p><div class="well"><code>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;int i = 5;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;const int& cr = i;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;cr = 2; // compiler error<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;const int x = i;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;x = 2; // another compiler error<br/>
+}<br/>
+</code></div><p>
+Next, we will look at writing our own classes.<br/>
+<br/>
+Exercise: How could you pass 42 to <code>f</code> without ambiguity?<br/>
+</p>
+<ul class="pager">
+  <li class="previous">
+    <a href="References.html">&larr; References</a>
+  </li>
+  <li class="next">
+    <a href="UDTs.html">User Defined Types &rarr;</a>
+  </li>
+</ul>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

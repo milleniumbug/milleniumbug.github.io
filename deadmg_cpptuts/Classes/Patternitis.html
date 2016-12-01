@@ -1,0 +1,43 @@
+
+
+
+
+<p>
+When object orientation was first introduced, it was obvious that this was a powerful new feature. What was less obvious was exactly how to go about being object orientated. In late 1994, a group known as the Gang of Four (GoF) came along and added to that misery with Design Patterns. These were, supposedly, structures that they had seen repeatedly amongst real-world code samples, which were good. Unfortunately, this really did more harm than good- not to mention that a good chunk of patterns really aren't.<br/>
+<br/>
+The main thing to be aware of is that good code is not built from patterns. Patterns are not atoms, and good code is not a molecule. Patterns <i>can</i> be useful but have to justify their existence and design just like any other piece of code- and indeed, a piece of code is not a pattern by default. Unfortunately, this is not the message that many people received from the Design Patterns book. You can even see it taken to extremes where people seek to label any useful code (and plenty of non-useful code) as a pattern.<br/>
+<br/>
+The book names 23 patterns. We won't look at all of them, but we will see some examples. The first one is the Strategy pattern. The essence of the Strategy pattern is to select between various algorithms at run-time. </p><div class="well"><code>
+class strategy_base { public: virtual void execute() = 0; virtual ~strategy_base() {} };<br/>
+class first_strategy : public strategy_base {<br/>
+public:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;void execute() { std::cout &lt;&lt; &quot;First!&quot;; }<br/>
+};<br/>
+class second_strategy : public strategy_base {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;void execute() { std::cout &lt;&lt; &quot;Second!&quot;; }<br/>
+};<br/>
+std::unique_ptr&lt;strategy_base&gt; get_strategy(std::string strat) {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;if (strat == &quot;first&quot;) return make_unique&lt;first_strategy&gt;();<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;else return make_unique&lt;second_strategy&gt;();<br/>
+}<br/>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::string s;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::cin &gt;&gt; s;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;get_strategy(s)-&gt;execute();<br/>
+}<br/>
+</code></div><p>
+You might observe, however, that this is somewhat redundant- there's really no need for these classes to exist.</p><div class="well"><code>
+std::function&lt;void()&gt; get_strategy(std::string s) {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;if (s == &quot;first&quot;) return [] { std::cout &lt;&lt; &quot;First!&quot;; };<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;else return [] { std::cout &lt;&lt; &quot;Second!&quot;; };<br/>
+}<br/>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::string s;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::cin &gt;&gt; s;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;get_strategy(s)();<br/>
+}<br/>
+</code></div><p>
+It is difficult to see how "Select what to do based on some input" qualifies as a special object-orientated thing. Dynamic linkers did exactly this a long time before object-orientation ever existed- given a DLL/.so/whatever as input, return dynamically linked function to call. A shrewd reader will also notice that this is suspiciously similar to, well, a <code>virtual</code> function.<br/>
+</p>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

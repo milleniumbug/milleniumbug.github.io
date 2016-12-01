@@ -1,0 +1,57 @@
+
+
+
+
+<h1><code>std::unique_ptr</code></h1>
+<p>Every program needs resources. The most obvious is memory, but there's also files, other kernel objects, Internet bandwidth, database connections, and whatever else you might think of. These need creating and disposing. 
+Doing this manually is tedious and error-prone to say the least, but fortunately, the Standard Library is here to help. <code>std::unique_ptr</code> lives in <code>&lt;memory&gt;</code> and is templated on the type of the 
+resource we wish to handle. In addition, it can have a customized deleter, but we won't need that yet.</p>
+<p>The basic principle behind <code>unique_ptr</code> is that each resource is owned by one, and exactly one, <code>unique_ptr</code>. In addition, <code>unique_ptr</code> resources can be transferred but 
+only by moving the <code>unique_ptr</code>. The class cannot be copied- your compiler will cry. <code>unique_ptr</code> can also be null. A default-constructed <code>unique_ptr</code> is guaranteed to be <code>null</code>. 
+<code>unique_ptr</code> is typically constructed with a pointer to the resource it is expected to handle. In order to create a resource of type T, we will use <code>new T()</code>. The <code>new</code> keyword will 
+dynamically create an object, of type T, and return a pointer to it. An object which has <i>dynamic storage duration</i> means that it has a lifetime determined by you, and it's your job to tell the program when 
+to destroy the object. The purpose of unique_ptr is to say "Destroy this object when the unique_ptr is destroyed", which means that in reality, we don't have to worry about it. Constructor arguments go in the 
+parenthesis as before. Since we have <code>std::unique_ptr</code> we don't need the inverse operation just now.</p>
+<p>Finally, you cannot <i>implicitly</i> create a <code>std::unique_ptr</code> from a pointer- it must be explicit.</p>
+<div class="well"><code>
+#include &lt;iostream&gt;<br />
+#include &lt;memory&gt;<br />
+std::unique_ptr&lt;int&gt; f(std::unique_ptr&lt;int&gt; arg) {<br />
+&nbsp;&nbsp;&nbsp;&nbsp;return arg; // Implicit move<br />
+}<br />
+int main() {<br />
+&nbsp;&nbsp;&nbsp;&nbsp;std::unique_ptr&lt;int&gt; x(new int());<br />
+&nbsp;&nbsp;&nbsp;&nbsp;f(new int()); // Bad- implicit creation<br />
+&nbsp;&nbsp;&nbsp;&nbsp;f(std::unique_ptr&lt;int&gt;(new int())); // Good- explicit<br />
+&nbsp;&nbsp;&nbsp;&nbsp;f(x); // Bad- attempted to copy<br />
+&nbsp;&nbsp;&nbsp;&nbsp;x = f(std::move(x)); // Good- explicit move into f. Before f returns, x no longer owns 
+&nbsp;&nbsp;&nbsp;&nbsp;// the int. We give it right back in this sample, though.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; *x; // Can have operator* and operator-&gt; like any pointer<br />
+} // Resource implicitly cleaned up for us when x goes out of scope.<br />
+</code></div>
+<p>In some conditions, the compiler can automatically move for us. Whenever a temporary is involved, move is implicit. In addition, if you return from a function, where the return statement is just <code>return ptr;</code> 
+for some <code>unique_ptr&lt;T&gt; ptr;</code> then the compiler can also implicitly move for you.</p>
+<p>Creating temporary <code>std::unique_ptr</code> (or any similar resource-managing pointer), as shown in the good call to <code>f</code> above, is tedious and in some niche cases, actually unsafe. The Standard does not 
+provide a function to solve this (a known defect), but we can write one. To understand the mechanics behind this, you'll need to finish the Template Metaprogramming segment- but for now, you can just use it.</p>
+<div class="well"><code>
+template&lt;typename T, typename... Args&gt; std::unique_ptr&lt;T&gt; make_unique(Args&&... args) {<br />
+&nbsp;&nbsp;&nbsp;&nbsp;return std::unique_ptr&lt;T&gt;(new T(std::forward&lt;Args&gt;(args)...));<br />
+}<br />
+int main() {<br />
+&nbsp;&nbsp;&nbsp;&nbsp;f(make_unique&lt;int&gt;()); // Much simpler<br />
+&nbsp;&nbsp;&nbsp;&nbsp;auto p = make_unique&lt;std::string&gt;("Hello");<br />
+&nbsp;&nbsp;&nbsp;&nbsp;// Pass constructor arguments to make_unique<br />
+&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; *p; // Prints "Hello"<br />
+}<br />
+</code></div>
+<p>Unique ownership is the most common kind of ownership of an external resource. The other model provided by the Standard is shared ownership, by <code>std::shared_ptr</code>. </p>
+<ul class="pager">
+  <li class="previous">
+    <a href="Iterators.html">&larr; Iterators</a>
+  </li>
+  <li class="next">
+    <a href="SharedPtr.html"><code>std::shared_ptr</code> &rarr;</a>
+  </li>
+</ul>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

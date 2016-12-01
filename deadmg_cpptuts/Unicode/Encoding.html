@@ -1,0 +1,25 @@
+
+
+
+
+<p>
+There are no less than seven ways to encode Unicode- and that's only the official ones. To begin, we'll need to define some simple terms.<br/>
+<br/>
+A <i>codepoint</i> is a 21bit value which is in the Unicode character set. This is the decoded value- the Unicode Standard deals with algorithms in terms of codepoints.<br/>
+<br/>
+A <i>glyph</i> is a single rendered character as the user might see it.<br/>
+<br/>
+A <i>codeunit</i> is one unit of the source encoding.<br/>
+<br/>
+For ASCII, you could choose to say that, roughly, all three are the same. But for Unicode, we are going to have to treat them differently.<br/>
+<br/>
+The first encoding is UTF-8. UTF-8 has two primary advantages- it's 8bit, so all that old code which used <code>char</code> to store 1 character can now store 1 codepoint. The first 128 characters in the Unicode set are the same as the basic ASCII set, and they are also stored as one UTF-8 8bit codeunit. This makes it work (as far as it can) with older applications and types. In addition, it's the smallest encoding- often used for e.g. Web. Finally, as a byte encoding, it's endianness-independent. I won't go into the gory details here (you can easily look them up on Wikipedia) but UTF-8 occupies 1-4 bytes. This variable length is what can make it difficult to work with for interfaces which weren't designed for such. It's fairly simple to encode and decode UTF-8 into codepoints by simply shifting some bits.<br/>
+<br/>
+The second encoding is UTF-16. Early in Unicode's development, it was believed that 16bits would be enough (it wasn't). A number of important platforms like Windows and Java used UCS-2 (as it was known). To extend this for Unicode's 21bit range, it was extended with <i>surrogate pairs</i>. This means that some values in the range specially mean that the next value also contains some data to contribute towards the current codepoint. If it's not a surrogate, then the 16bit value is expresses one codepoint where the higher five bits are all zero. This actually counts as <i>three</i> encodings. UTF-16 contains a Byte Order Mark, or BOM. This BOM encodes the endianness of the source data. There is also UTF-16 LE, and UTF-16 BE, which are always little-endian and big-endian, respectively. You can still find plenty of bugs in Windows software where they do not correctly handle surrogate pairs.<br/>
+<br/>
+The third encoding is UTF-32. This is a simple 1:1 correspondence- each 32bit code unit is 1 codepoint. Consumes a lot of memory but fixed-length and relatively simple. Also comes in UTF-32 with BOM, UTF-32 LE and UTF-32 BE.<br/>
+<br/>
+The Standard defines that <code>char</code> shall be big enough to hold one character of the <i>basic execution character set</i>. It doesn't define what this set is. On G++ for Unix, it'll be UTF-8. For Windows, it's codepages, although they're both 8bit. In addition, we meet <code>wchar_t</code>. This is big enough to hold one character of the <i>extended execution character set</i>. Once again, this set isn't defined. It's UTF-32 on G++ and UTF-16 on Windows. This also means that we meet another string type- <code>std::wstring</code>. This is like <code>std::string</code> but operates on <code>wchar_t</code> instead of <code>char</code>. In addition, you can get <code>wchar_t</code> literals by prefixing <code>L</code>- that is, <code>L"wide str"</code>, a wide unhelpful string. The Standard does not provide any facility in any string class to deal with variable length encodings, nor codepoint-codeunit conversions. This seriously limits the usefulness of <code>std::string</code>/<code>std::wstring</code>- pretty much all you can guarantee is ASCII. The <code>wchar_t</code> is a little more reliable at usually some variant of Unicode. But if you need to actually store or transmit these, then you'll need to roll your own- and roll your own conversions from the various kinds of literal and string. This unfortunately means that there are many duplicates of C++ facilities- <code>std::wstring</code>, <code>std::wstringstream</code>, etc.<br/>
+</p>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

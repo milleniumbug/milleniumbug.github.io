@@ -1,0 +1,64 @@
+
+
+<h1>Classes</h1>
+<p>
+Our previous class had no data members. But a class can hold arbitrary members of arbitrary types.</p><div class="well"><code>
+class my_class {<br/>
+public:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;int x;<br/>
+};<br/>
+</code></div><p>
+The compiler-generated constructor, destructor, and assignment operator will perform a member-wise function. In order to access a member of a class, use a dot <code>.</code></p><div class="well"><code>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;my_class m; // calls compiler-generated default constructor, which does not initialize the int<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;m.x = 5;&nbsp;&nbsp;&nbsp;&nbsp;// so reading it is still UB.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;my_class m2 = m; // calls compiler-generated copy constructor which copies the int<br/>
+}<br/>
+</code></div><p>
+Previously, we only looked at <code>public</code> members. Now we will introduce <code>private</code> members, and member functions.</p><div class="well"><code>
+class my_class {<br/>
+private:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;int x;<br/>
+public:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;int get_x() { return x; }<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;my_class(int y) { x = y; }<br/>
+};<br/>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;my_class m; // Illegal: no default constructor. The compiler refused to make one for us.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;my_class m2(5); // calls my_class(int).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;m2.x = 2; // Illegal: my_class::x is private.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; m2.get_x(); // calls member function<br/>
+}<br/>
+</code></div>
+<p>
+Member functions always know the object they are being invoked on. They are passed a pointer, something we will study in the next tutorial, to the current object. A pointer is similar to a reference, where <code>*ptr</code> yields a reference, and you can use <code>-&gt;</code> to access members directly (instead of <code>.</code>). When <code>m2.get_x()</code> is invoked, then <code>this</code> points to <code>m2</code>. When we access a member variable or function from a member function, then implicitly, we refer to the function or variable of the object pointed to by <code>this</code>. Doing that every time would be arduous, so fortunately we can skip it.<br/>
+<br/>
+In the above example, we combined a private variable with a member function to allow read-only access to it's contents. This is just one of the complex behaviours a class can be written to allow.<br/></p>
+<h1>Namespaces</h1>
+<p>In addition, we shall introduce namespaces. Namespaces are simple code organization tools. If something is in a namespace, you have to refer to it explicitly.</p><div class="well"><code>
+namespace foo {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;void print() { std::cout &lt;&lt; &quot;Foo!\n&quot;; }<br/>
+}<br/>
+namespace bar {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;void print() { std::cout &lt;&lt; &quot;Bar!\n&quot;; }<br/>
+}<br/>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;print(); // Compiler cries: What is print?<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;foo::print();<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;bar::print();<br/>
+}<br/>
+</code></div><p>
+The <code>::</code> operator is the <i>scope resolution operator</i>, and it applies to classes as well as namespaces. When we refer to a name without explicitly telling the compiler where to look through <code>::</code>, it is called an <i>unqualified</i> reference. When we explicitly tell the compiler where to look, it is a <i>qualified</i> lookup. Things defined outside any namespace are considered to be inside the global namespace. You can qualify calls to be in the global namespace by using <code>::</code> without a preceeding name- e.g., <code>::print()</code>. Namespaces can also be nested inside each other. When we refer to <code>std::cout</code>, this means that we find <code>cout</code> inside the <code>std</code> namespace.<br/>
+<br/>
+Exercise: For an unqualified call from a function inside namespace foo, will it prefer a function defined in the foo namespace, or the global namespace?<br/>
+</p>
+<ul class="pager">
+  <li class="previous">
+    <a href="UDTs.html">&larr; User Defined Types</a>
+  </li>
+  <li class="next">
+    <a href="Exceptions.html">Exceptions &rarr;</a>
+  </li>
+</ul>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

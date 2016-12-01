@@ -1,0 +1,52 @@
+
+
+<h1>Functions</h1>
+<p>
+Functions are little pieces of re-usable code. All programs are effectively composed of functions calling functions calling functions. For example, imagine what life would be like if, when you wanted to read an integer, you had to repeat those ten lines of code we used previously. It would get very old, very quickly- and what is the probability that you would make an error? Or if you needed to change one, you would forget to change the rest? This is especially bad if it is scattered all through the program. So instead, we will take out that code and put it in our own function.</p><div class="well"><code>
+#include &lt;iostream&gt;<br/>
+int read_integer() {<br/>
+</code></div><p>
+This line defines the return type (<code>int</code>), the function name (<code>read_integer</code>) and the arguments (none). The return type of the function is a value that you promise to give the caller when you are done. If you don't wish to give back anything, then you can return <code>void</code>- a special type that effectively means "nothing". The arguments are the things you need to do that job.</p><div class="well"><code>
+&nbsp;&nbsp;&nbsp;&nbsp;int i;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; &quot;Please enter an integer.\n&quot;;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;while(!(std::cin &gt;&gt; i)) {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; &quot;Could not determine value from input. Please enter again.\n&quot;;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::cin.clear();<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::cin.ignore(std::numeric_limits&lt;std::streamsize&gt;::max(), '\n');<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br/>
+</code></div><p>
+These lines are the same as from the previous tutorial, but they have had the comments stripped. Finally, we return.</p><div class="well"><code>
+&nbsp;&nbsp;&nbsp;&nbsp;return i;<br/>
+}<br/>
+</code></div><p>
+Returning is where we end the execution of our function, and whoever calls it resumes executing. In this case, we also return an <code>int</code> (as promised) and here, that <code>int</code> is a copy of <code>i</code>. Note that it is possible for you to exit a function without returning a value if you promised one. This is UB- except for <code>main</code>. If you return without returning anything, you can just use <code>return;</code>. Now we can read as many integers as we like without having to repeat the code.</p><div class="well"><code>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;int one = read_integer(); // Call and take return value<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;int two = read_integer();<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;int three = read_integer();<br/>
+}<br/>
+</code></div><p>
+This makes our life nice and convenient, and forms the one of the most core fundamentals of good programming. This fundamental is known as DRY- Don't Repeat Yourself. Essentially, DRY states that everything should be done in only one place. This makes fixing bugs and making changes and understanding the codebase simpler, because you only ever have to find one place. Sounds simple.</p><div class="well"><code>
+int rand_mod(int i) {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;return std::rand() % i;<br/>
+}<br/>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; rand_mod(5);<br/>
+}<br/>
+</code></div><p>
+When rand_mod is executed, <code>i</code> will be substituted by 5, the parameter we gave it. This means that we now possess the capacity to write functionality which is independent of specific run-time values. The *scope* of <code>i</code> is that of the whole of the function.<br/>
+<br/>
+Unfortunately, our naive approach appears to have a problem. Namely, it can only read <code>int</code>. Are we supposed to create bunches of read_x() functions for each type? We're back to our original problem- we need about a dozen of these functions (or potentially a lot more). The solution is called a template, and we will encounter it soon.<br/>
+<br/>
+Exercise: What happens if you try to place the function definition <i>after</i> <code>main</code>?<br/>
+</p>
+<ul class="pager">
+  <li class="previous">
+    <a href="Input.html">&larr; Input</a>
+  </li>
+  <li class="next">
+    <a href="Templates.html">Templates &rarr;</a>
+  </li>
+</ul>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

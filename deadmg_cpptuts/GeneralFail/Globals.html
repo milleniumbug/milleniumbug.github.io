@@ -1,0 +1,43 @@
+
+
+
+
+<p>
+Global state is the curse of many a codebase. Effectively, it is a variable which can be accessed from anywhere in the program. This is exceptionally bad from a maintenance perspective, because it could be used from an unlimited number of places in your program, and thus cause you an unlimited amount of headache to alter. In addition, it's state is completely unreliable, and by hiding API dependencies, it can make for some hard things. To declare a global variable, simply define a variable at namespace scope, for example</p><div class="well"><code>
+Database d;<br/>
+namespace foo {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;int bar;<br/>
+}<br/>
+</code></div><p>
+In addition, member variables may be <i>static</i> as well as member functions. These member variables must be <i>defined</i>, like member functions. You can also define function-local static variables.</p><div class="well"><code>
+class X {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;static int Y;<br/>
+};<br/>
+int f() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;static int y = 5;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;return y;<br/>
+}<br/>
+// in a source file<br/>
+int X::Y;<br/>
+</code></div><p>
+Consider:</p><div class="well"><code>
+Database d;<br/>
+void init_database() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;connect(d, ...);<br/>
+}<br/>
+... get_stuff_from_database() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;return d.f();<br/>
+}<br/>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;init_database();<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;auto result = get_stuff_from_database();<br/>
+}<br/>
+</code></div><p>
+There are no apparent connections here. An unlucky coder might decide that it's fine to re-order the calls- but of course, it's actually not. It gets even worse when you want to test your programs, because each test must set up and tear down each global variable to be properly independent. The amount of headache a global variable can cause you is unlimited, and avoid like the plague. This isn't even counting the difficulty of synchronization. They should be avoided like the plague and burned with fire wherever encountered.<br/>
+<br/>
+Note that, as in many other things, a global variable is an <i>interface</i> problem. There's nothing wrong with using a program-wide variable for, say, memoization, as long as it's scope is limited to the necessary function. In addition, lazily initialized constants (and other constants) do not genuinely count as globals- here, we are talking about public interface, mutable global state.<br/>
+<br/>
+There are, however, some things where a somewhat different perspective is required. For example, <code>std::cout</code> is a global variable, but that's fine. This is because it represents the Standard output stream- a facility provided by the OS of which there is most assuredly only one. Here, we think of <code>std::cout</code> as <i>process-local</i>- that is, there's one per process, rather than as <i>application-global</i>. This viewpoint only really works for per-process OS facilities, though.<br/>
+</p>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

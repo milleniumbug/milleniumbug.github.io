@@ -1,0 +1,28 @@
+﻿
+
+
+
+
+<h1>Ownership</h1>
+<p>The ownership model in C++ models how the program deals with resources- usually memory, but can be arbitrary. The simplest example is <code>std::vector</code>. When you add an item, then you cannot delete that item- 
+    you can only ask the vector to delete it. The vector <i>owns</i> that item. It has the right to destroy it when it wants to. When the vector is destroyed, the item is destroyed. All Standard containers own their 
+    contents. For function-local objects, they are owned by their scope- when they go out of scope, they are destroyed, and you cannot prematurely destruct them (well, you can, but doing that would be very, very silly). 
+    It is the compiler's job to destroy local objects.
+</p>
+<p>This ownership principle is recursive- if we have <code>std::vector&lt;std::vector&lt;int&gt;&gt;</code>, then the outer vector owns the inner vector- which owns the int objects within it. When the outer vector is 
+    destroyed, it'll take all the inner vectors with it- which will take all the int objects with them. An object of a class owns all it's member variables. All objects in C++ should have one, and exactly one, owner. In 
+    addition, that owner should never be, directly or indirectly, itself. If an object owns itself, then it will never be destroyed, as that would only occur- when it is destroyed. This means that ownership should be 
+    acyclic.
+</p>
+<p>While this is mighty convenient, things can get a little more problematic when considering owning objects that don't neatly fit into one of the containers we've previously looked at- they are all multiple-object 
+    value systems. Now we will look at the converse- single object, pointer systems. These are known as "Smart pointers". In this case, the pointer owns the pointed-to object in some fashion. When the pointer is destroyed, 
+    it will take action to destroy the pointee.
+</p>
+<p>To kick it off, the non-owning pointer- <code>T*</code>- also known as a raw pointer or, rarely, naked pointer or dumb pointer. This allows us to point to an object owned by someone else. References are often used 
+    for the same purpose in function bodies, parameters, and return types, although member references are exceedingly annoying and should usually be avoided.
+
+</p>
+
+
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

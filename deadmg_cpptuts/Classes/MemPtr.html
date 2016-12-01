@@ -1,0 +1,28 @@
+
+
+
+
+<p>
+A <i>member pointer</i> points to a member of a class, but without an instance. The syntax is</p><div class="well"><code>
+class my_class { public: int x; void f(); };<br/>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;int my_class::* ptr = &my_class::x;<br/>
+}<br/>
+</code></div><p>
+Of course, we could simply use <code>auto</code> in this situation. Given an instance of <code>my_class</code>, we can now retrieve the value/call the function.</p><div class="well"><code>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;auto ptr = &my_class::x;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;my_class m;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;m.*ptr = 5; // owch<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;auto mptr = &m;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;mptr-&gt;*ptr = 10; // more owch<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;void (my_class::* fptr)() = &my_class::f;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(mptr-&gt;*fptr)();<br/>
+}<br/>
+</code></div><p>
+There is a similar version for member function pointers. They share almost all of the downsides of function pointers- their syntax is awful, they're completely nongeneric (good luck getting a member function pointer to a lambda), and their interactions with inheritance are inherently unsafe.<br/>
+<br/>
+Before <code>std::function</code> and binding was introduced, they were commonly used for callbacks. As with normal function pointers, the main advice is to steer clear where you can, and use them minimally if you have a legacy API which requires them.<br/>
+</p>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

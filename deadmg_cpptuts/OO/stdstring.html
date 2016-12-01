@@ -1,0 +1,46 @@
+
+
+
+
+<h1><code>std::string</code></h1>
+<p>
+Find your nearest reference and have a look at all the member functions of <code>std::string</code>, counting all overloads.</p>
+ <p>
+- 6x <code>append</code><br/>
+- 6x <code>assign</code><br/>
+- 6x <code>compare</code><br/>
+- 4x <code>find</code><br/>
+- 8x <code>insert</code><br/>
+- 10x <code>replace</code><br/>
+<br/>
+Holy cow. And those are just some of the more numerous ones. Fortunately, the problem with <code>std::string</code>'s interface can be seen with just one of these bad boys- <code>append</code>.<br/>
+<br/>
+The first two <code>append</code> overloads are <code>unhelpful string</code> and <code>unhelpful string, size</code> respectively, where <code>size</code> is the maximum number of characters to append, and the first overload appends all of them. This immediately means that the first overload is completely redundant, as you could write it exactly as</p><div class="well"><code>
+void append(std::string& s, unhelpful string us) {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;s.append(us, get_unhelpful_string_size(us));<br/>
+}<br/>
+</code></div><p>
+A whole member function to achieve this? If it was instead written as a free function, you would reduce the number of functions with access to the private data of <code>std::string</code>- an unquestionable win. The problem becomes even worse when we consider the next overload of <code>append</code>- one that takes a pair of iterators that describe the data. Unhelpful strings can quickly and easily be converted to a pair of iterators.</p><div class="well"><code>
+void append(std::string& s, unhelpful string us, size_t size) {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;size = std::min(size, get_unhelpful_string_size(us)); // Don't wanna go over<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;s.append(us, us + size);<br/>
+}<br/>
+</code></div><p>
+The next overload of <code>append</code> takes a <code>std::string</code>, an offset, and a count. That could be exactly equivalent to</p><div class="well"><code>
+void append(std::string& s, const std::string& src, size_t off, size_t count) {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;count = std::min(count, src.size() - off); // Make sure count is within range<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;s.append(src.begin() + off, src.begin() + off + count);<br/>
+}<br/>
+</code></div><p>
+You can perform an even simpler transmutation for the overload that takes only another <code>std::string</code>. The final overload takes a character, and a number of times to append it. This is less trivial to convert, but is more than possible. So for the six overloads of <code>append</code>, only <i>one</i> of them actually needed to exist. This is a sorry state of affairs. The primary reason it exists is because of legacy code. When the Standard was beginning, iterators didn't exist, and <code>std::string</code> with all the indices and the rest were designed. Unfortunately, people started coding with these classes before they were actually finalized. When iterators and the Standard Template Library (not to be confused with the Standard Library) came along, <code>std::string</code> was adapted to be a real container. But the Standard's authors didn't feel up to breaking all the code that was previously written, so they just <i>left it</i> with a bajillion overloads of everything.<br/>
+<br/>
+And just for the final nail in the coffin, it's slow as hell to concatenate, because it doesn't use expression templates. Even with the large improvement offered by move semantics, it's still O(n^2) instead of O(n).<br/>
+<br/>
+And that's not even counting the Unicode stuff, which we will look at later. Owch. The lesson is: Prefer free functions over member functions, and don't add overloads just because you can.</p>
+<ul class="pager">
+  <li class="next">
+      <a href="iostreams.html"><code>iostreams</code> &rarr;</a>
+  </li>
+</ul>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

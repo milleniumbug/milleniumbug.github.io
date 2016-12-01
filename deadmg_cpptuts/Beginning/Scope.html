@@ -1,0 +1,60 @@
+
+
+<h1>Lexical Scope</h1>
+<p>
+In our previous tutorial, we met simple control logic. Here, we are going to visit a natural consequence of that logic- lexical scope. We already learned that you can't use a variable before construction- this is the simplest manifestation of scope.<br/>
+ </p><div class="well"><code>
+#include &lt;iostream&gt;<br/>
+#include &lt;string&gt;<br/>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; s; // What's s?<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::string s = &quot;Hello&quot;;<br/>
+}<br/>
+</code></div><p>This simple program demonstrates that when you declare a variable, it doesn't become available everywhere. In fact, <code>s</code> has a very strictly defined "scope". When control leaves this scope, the variable is said to "go out of scope", and you can no longer access it. When a variable is declared inside <code>if</code> or any of the others, their scope is fixed to that <code>if</code>.</p><div class="well"><code>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;if(true)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::string s = &quot;Hello&quot;;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; s; // What's s?<br/>
+}<br/>
+</code></div><p>
+After all, consider what happened if I had replaced <code>true</code> with <code>false</code>, or made it random. The compiler cannot know if <code>s</code> exists. This is even true if <code>s</code> is created on <i>both</i> branches.</p><div class="well"><code>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;if (true)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::string s = &quot;Hello&quot;;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;else <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::string s = &quot;World&quot;;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; s; // What's s?<br/>
+}<br/>
+</code></div><p>
+Whilst this demonstrates our point with <code>if</code>, this is true for any <i>compound-statement</i>, including the one which makes up the body of <code>main</code> (the bit after the brackets), or those introduced after an <code>if</code>, <code>for</code>, <code>while</code>, or introduced explicitly. Note that control statements with only a single statement and no curly braces still counts as a compound statement for the purpose of these rules.</p><div class="well"><code>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// Explicitly introduce new scope<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::string s = &quot;Won't be seeing me around&quot;;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; s; // What's s?<br/>
+}<br/>
+</code></div><p>
+This also means that you can "shadow" variables from previous scopes.</p><div class="well"><code>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;int output = 5;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;{<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::string output = &quot;String!&quot;; // Hides the previous variable.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; output; // Prints &quot;String!&quot;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; output;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;// Prints 5, as the other output is now out of scope and doesn't exist.<br/>
+}<br/>
+</code></div>
+<p>This is generally a bad idea, as the same statement has two different effects and can be confusing. Some compilers will issue a warning about variable shadowing.</p>
+<p>Exercise: How is scope related to the indentation shown in the examples?</p>
+<ul class="pager">
+  <li class="previous">
+    <a href="FlowControl.html">&larr; Flow Control</a>
+  </li>
+  <li class="next">
+    <a href="Input.html">Input &rarr;</a>
+  </li>
+</ul>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

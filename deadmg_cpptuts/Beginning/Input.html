@@ -1,0 +1,45 @@
+
+
+<h1>Input</h1>
+<p>Taking input from the outside world is an essential process for any program. Nobody would get anything done if they couldn't take input. Unfortunately, it's also a risky business. That user typing on his keyboard doesn't have to enter a number where you think there should be one. He could enter anything. Maybe he just doesn't know what he's supposed to do- or maybe he's trying to attack your program. This means that well-written programs which take input from untrusted sources must always check the correctness of that input. Failure to validate input is a serious problem.</p>
+<p>In C++, the Standard iostream library provides an companion object to <code>std::cout</code>. This object is, appropriately, named <code>std::cin</code>. This can be used to take input from the user. The object- and the return value of <code>std::cin &gt;&gt; var</code>- can be implicitly converted to boolean. If the boolean is false, then the input failed. If it is true, the input succeeded. This simple program requests input from the user until it's valid.</p>
+<div class="well"><code>
+#include &lt;iostream&gt;<br/>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;int i = 0; <br />
+&nbsp;&nbsp;&nbsp;&nbsp;// always best to set a value just in case<br />
+&nbsp;&nbsp;&nbsp;&nbsp;// since if it failed and we read it by accident, UB.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; &quot;Please enter an integer.\n&quot;;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;// While the user did not enter a valid integer<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;while(!(std::cin &gt;&gt; i)) {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// Ask the user for new input<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; &quot;Could not determine value from input. Please enter again.\n&quot;;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// Tell std::cin that it's OK to try again<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::cin.clear();<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/* Tell cin to forget everything up until the next line of user input<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;so we don't repeatedly try to read the same bad input. */<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::cin.ignore(std::numeric_limits&lt;std::streamsize&gt;::max(), '\n');<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; &quot;The integer you entered was &quot; &lt;&lt; i &lt;&lt; &quot;\n&quot;;<br/>
+}<br/>
+</code></div><p>
+Like <code>std::cout</code>, <code>std::cin</code> can deal with a variety of data types, including strings, integers, and more. <code>std::cin</code> and <code>std::cout</code> both have the curious property of returning... <code>std::cin</code> and <code>std::cout</code>. This means that</p><div class="well"><code>
+std::cout &lt;&lt; &quot;Oh&quot; &lt;&lt; &quot;ai&quot;;<br/>
+</code></div><p>
+is perfectly legal and valid C++, and is quite equivalent to<br/>
+ </p><div class="well"><code>
+std::cout &lt;&lt; &quot;Oh&quot;;<br />
+std::cout &lt;&lt; &quot;ai&quot;;<br/>
+</code></div><p>
+Exercise: What is the behaviour of reading a string from <code>std::cin</code>?<br/>
+</p>
+<ul class="pager">
+  <li class="previous">
+    <a href="Scope.html">&larr; Scope</a>
+  </li>
+  <li class="next">
+    <a href="Functions.html">Functions &rarr;</a>
+  </li>
+</ul>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

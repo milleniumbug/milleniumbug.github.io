@@ -1,0 +1,37 @@
+﻿
+
+
+
+
+<h1><code>std::tuple</code></h1>
+<p><code>std::tuple</code> in <code>&lt;tuple&gt;</code> is a container for containing N items, where N and the type of each item is fixed at compile-time. You use <code>std::get</code> to access that item. The index must be known at compile-time.</p>
+<div class="well"><code>
+#include &lt;tuple&gt;<br />
+#include &lt;iostream&gt;<br />
+int main() {<br />
+&nbsp;&nbsp;&nbsp;&nbsp;std::tuple&lt;int, int, int&gt; x;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;std::get&lt;0&gt;(x) = 5; // Sets the first value to 5.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; std::get&lt;0&gt;(x); // Prints first value.<br />
+}
+</code></div>
+<p>You can have a tuple of as many elements as you like. Tuples are copyable, movable, and comparable if their element types are. The first notable support function is <code>std::tie</code>. The second is <code>std::make_tuple</code>.</p>
+<div class="well"><code>
+#include &lt;tuple&gt;<br />
+int main() {<br />
+&nbsp;&nbsp;&nbsp;&nbsp;int a, b, c;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;std::tie(a, b, c) = std::make_tuple(0,0,0);<br />
+}<br />
+</code></div>
+<p><code>std::tie</code> creates a tuple of references to it's arguments. <code>std::make_tuple</code> creates a tuple of it's arguments. When they are assigned, each element in the right-hand-side tuple is assigned to an element in the left-hand-tuple- and as those elements are references, in reality the tie arguments are modified.</p>
+<p>We also meet <code>std::pair</code> in <code>&lt;utility&gt;</code>. It's the baby version of <code>std::tuple</code>, for just two elements. You can access the first element through the <code>first</code> member and the second through the <code>second</code> member. It rarely sees use, as it's almost entirely strictly superseded by <code>std::tuple</code> except that some of the other Standard containers use it in their interface. As with <code>std::tuple</code>, there is a <code>std::make_pair</code>.</p>
+<ul class="pager">
+  <li class="previous">
+    <a href="Deque.html">&larr; <code>std::deque</code></a>
+  </li>
+  <li class="next">
+    <a href="Map.html"><code>std::{map|set}</code> &rarr;</a>
+  </li>
+</ul>
+
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

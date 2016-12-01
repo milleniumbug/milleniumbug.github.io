@@ -1,0 +1,80 @@
+
+
+
+
+    <h1><code>template</code> and <code>typename</code></h1>
+<p>
+You may observe that you could simply delegate a function to a static member of a class to partially specialize it- which you can. Here, we will also introduce the <code>typedef</code>. A <code>typedef</code> simply declares an alias for another type. You can access the typedefs of types through the <code>::</code> operator, as you can with values. Conventionally, <code>type</code> is used for the output of template metaprograms that operate on types.</p><div class="well"><code>
+template&lt;typename T&gt; struct return_type {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;typedef int type;<br/>
+};<br/>
+// specs<br/>
+template&lt;typename T&gt; struct function_contents {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;return_type&lt;T&gt;::type func() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br/>
+};<br/>
+// specs<br/>
+template&lt;typename T&gt; return_type&lt;T&gt;::type func() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;return function_contents&lt;T&gt;::func();<br/>
+}<br/>
+</code></div><p>
+Unfortunately, this little snippet failed to compile. Your compiler cried about a syntax error. But there's nothing obviously wrong with the program. To understand what's going on, we need to understand a little more about our compiler and language. Consider the following program:</p><div class="well"><code>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;x * p;<br/>
+}<br/>
+</code></div><p>
+Now, does that do a pointless multiplication or declare a pointer variable? Well, it could really go either way.</p><div class="well"><code>
+typedef int x; // Now it's a pointer<br/>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;x * p;<br/>
+}<br/>
+</code></div><p>
+Or </p><div class="well"><code>
+int x; // Now it's a multiplication<br/>
+int p; <br />
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;x * p;<br/>
+}<br/>
+</code></div><p>
+This is just the simplest example of what is known as <i>context-sensitivity</i>. Essentially, in order to understand a piece of C++, you must know the previous contents of the file- we need to know if <code>x</code> is a value or a type in order to make sense of this statement. Unfortunately, when dealing with a template, you don't have that luxury- any given template argument might have one, or the other. So is <code>return_type&lt;T&gt;::identifier</code> a type or a value? In order to resolve this problem, we introduce <code>typename</code>. The <code>typename</code> keyword is required wherever a <i>dependent type</i> is used. In short, this means any type which depends on a template argument. To fix our previous problem, we write</p><div class="well"><code>
+template&lt;typename T&gt; struct return_type {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;typedef int type;<br/>
+};<br/>
+// specs<br/>
+template&lt;typename T&gt; struct function_contents {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;typename return_type&lt;T&gt;::type func() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br/>
+};<br/>
+// specs<br/>
+template&lt;typename T&gt; typename return_type&lt;T&gt;::type func() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;return function_contents&lt;T&gt;::func();<br/>
+}<br/>
+</code></div><p>
+With the introduction of <code>typename</code>, the compiler is happy once again. <code>template</code> solves a similar problem with templated members.</p><div class="well"><code>
+template&lt;typename T&gt; void f(T t) {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;t.template x&lt;F&gt;(1); // Member function call with explicit template parameter<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;t.x &lt; F &gt; (1); // A pair of silly comparisons with a member variable with some redundant parenthesis<br/>
+}<br/>
+</code></div><p>
+Here, we use <code>template</code> to disambiguate, where <code>template</code> means "explicit member function call". Some compilers, like Visual Studio, are more lax about this than others.<br/></p>
+<p>Finally, C++11 provides <i>template aliases</i> for us to use. As these are always types, there's no need for <code>typename</code> when using one.</p>
+<div class="well"><code>
+#include &lt;vector&gt;<br />
+// Traditional- access as typename add_vector&lt;T&gt;::type<br />
+template&lt;typename T&gt; struct add_vector {<br />
+&nbsp;&nbsp;&nbsp;&nbsp;typedef std::vector&lt;T&gt; type;<br />
+}<br />
+// C++11- access as add_vector&lt;T&gt;<br />
+template&lt;typename T&gt; using add_vector = std::vector&lt;T&gt;;<br />
+</code></div>
+<p> You see, the template alias is quick, simple and easy to both define and use. An alias does not have to be a template- it's also a direct replacement for typedef. Unfortunately, Visual Studio does not yet support this use of aliases, so most of the samples will still use typedef.</p>
+<ul class="pager">
+  <li class="previous">
+      <a href="Factorial.html">&larr; Factorial</a>
+  </li>
+  <li class="next">
+      <a href="PerfectForwarding.html">Perfect Forwarding &rarr;</a>
+  </li>
+</ul>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

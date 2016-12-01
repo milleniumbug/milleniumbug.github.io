@@ -1,0 +1,38 @@
+
+
+
+
+<p>A C Array is a language primitive that's an array- <code>std::array</code> is implemented by wrapping one.</p>
+<div class="well"><code>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;T arr[size]; // Declares an array of T, of size &quot;size&quot;<br/>
+}<br/>
+</code></div><p>
+There are a number of problems with C arrays. Firstly, there is no bounds checking- ever. You will have to do it yourself, all the time. Secondly, the syntax is just abhorrent. Whilst the above doesn't seem too bad, you literally need an online tool (cdecl.org) to help decode functions which, for example, return pointers to arrays.<br/>
+<br/>
+But by far the most insidious "feature" is the pointer decay. This feature actually existed in C to be compatible with B, C's immediate predecessor, and is in C++ to be compatible with C. Namely, arrays are not true lvalues- for example, they cannot be assigned to.</p><div class="well"><code>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;int arr[1];<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;int arr2[1];<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;arr = arr2; // Compiler cries<br/>
+}<br/>
+</code></div>
+<p>This is because whenever an array's name is used, it decays to an rvalue pointer to it's first element. Arrays in C are always passed as pointers- to the extent where <code>void f(int arr[])</code> is identical to <code>void f(int* arr);</code>. Note that there is no way to determine the size of an array if you don't already know, or implement your own mechanism (terminating values are common for C code). C++ reduced this a bit so arrays don't decay in as many contexts as they did in C, but it's still a lot. This muddling between pointers and arrays, propagated by poor teaching material, is commonly a large source of confusion. You can often find it erroneously stated that arrays *are* pointers- as if they are equivalent. In addition, note the thorough type-unsafety here (pointer to N objects, where N &gt;= 1 is all you've got), and the run-time unsafety. It's UB to go over the bounds, and you have no idea where the bounds are, <i>and</i> it might not even be an array.</p>
+<p>Compounding it is how multi-dimensional arrays do not behave this way- only the <i>first</i> dimension can decay this way. The other dimensions cannot. In addition, when taking them as parameters, they must always have known sizes. You can have the compiler deduce the array size as well, if you wish.</p>
+<div class="well"><code>
+template&lt;int N&gt; void f(int (&arr)[N]) { <br />
+&nbsp;&nbsp;&nbsp;&nbsp;// told you the syntax was bad- reference to array.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; N;<br/>
+}<br/>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;int arr[5];<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;f(arr);<br/>
+}<br/>
+</code></div><p>
+In C++, you may also use ranged for over a C array. In addition, <code>std::begin</code> and <code>std::end</code> work for C arrays. To interoperate with C functions which take arrays (usually <code>T*, size</code> pairs), use <code>std::vector&lt;T&gt;::data()</code>, which is explicitly designed with this scenario in mind. Important to remember is that <code>sizeof(arr)</code> gives the size of the array (in bytes), but <code>sizeof(ptr)</code> <i>always</i> gives the size of a pointer. <code>sizeof</code>ing the wrong thing can lead to some very nasty pointer errors.<br/>
+<br/>
+Generally speaking, <code>std::array</code> is superior in every conceivable fashion. The best advice is to never use C arrays. As with <code>std::string</code>, it is a valid replacement in pretty much every situation.<br/>
+Also, don't forget that whilst we would use a dynamically-sized <code>std::vector</code> when we don't know the size, it's a common "optimization" for C programmers to declare an array of what's known as MAGIC_BUFFER_SIZE. It's a size of a buffer that they just hope is big enough where the actual size doesn't have any meaning except the wishful thinking of the original author.
+</p>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

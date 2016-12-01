@@ -1,0 +1,33 @@
+
+
+<h1>Pointers</h1>
+<p>A "pointer" is an object that aliases another object, similar to a reference. However, whilst a reference was transparent- that is, apparently identical to the source object- a pointer is not. Unlike references, there are no rvalue pointers (you cannot take the address of an rvalue), pointers can point to nothing (known as a NULL pointer, null pointer, nullptr, or just NULL), and pointers can be re-seated- that is, made to point to a different thing later. It is UB to attempt to de-reference a NULL pointer. Like <code>true</code> and <code>false</code> for bool, there is a null pointer literal- <code>nullptr</code>. <code>nullptr</code> is of type <code>std::nullptr_t</code>. The null pointer literal is a null pointer of any type- even the more exotic ones that we will find much later. Pointers can be compared to each other with <code>==</code> and <code>!=</code> to see if they point to the same object. They can also be compared directly to <code>nullptr</code>. Like references, attempting to read or write destroyed objects is a giant pile of UB. Along with recursion, pointers are typically a very difficult topic to grasp. A pointer's value is an <i>address</i>, the place where you can find some other object. This object is the pointed-to type.<br/>
+<br/>
+Here's a simple program using pointers:</p><div class="well"><code>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;int* p = nullptr; // declares a null pointer- notice * to denote a pointer<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;int i = 5;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;p = &i; // use & to take the address of an object- this yields int*<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;*p = 2; // sets i to 2 by de-referencing p to gain a reference to i.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;int i2 = 5;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;p = &i2;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;*p = 2; // sets i2 to 2.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;p = nullptr;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;*p = 2; // UB<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;int* p2;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;*p2 = 2; // Also UB. Pointers are not guaranteed to be initialized to NULL,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;// but reading an uninitialized pointer is UB like an uninitialized integer.<br/>
+}<br/>
+</code></div><p>
+Whereas you cannot refer to a reference- nor point to a reference- you can have a pointer to a pointer, or even a reference to a pointer, denoted as <code>T**</code> and <code>T*&</code>. It is often said that programmers who use two levels of indirection are "two-star" programmers, and "three-star" for someone using <code>T***</code>. The more stars you use in one place, the more of a derogatory term, in general. Programs which utilize more than one level of indirection at once are generally extremely difficult to understand and debug. Two levels can be done, but it's not great. Once you start getting to three or more, it's time to come up with a new approach. However, note that this isn't the <i>total</i> indirection, but only the indirection in any given piece of code at once. Template machinery can be made to yield pointers of arbitrary levels of indirection, and this isn't necessarily a bad thing- in fact, the way in which they can be used to hide complexity is one of their strong advantages, because each level can be dealt with separately, allowing you to deal with many levels of indirection without actually introducing crippling program complexity. One of the main motivations for pointers is that member references is nasty- they have to be bound in the constructor and are non-assignable, making a giant mess.</p>
+<p>Exercise: For <code>const int*</code>, is it a const pointer to int, or a pointer to const int?</p>
+<ul class="pager">
+  <li class="previous">
+    <a href="Define.html">&larr; <code>#define</code></a>
+  </li>
+  <li class="next">
+    <a href="Recursion.html">Recursion &rarr;</a>
+  </li>
+</ul>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

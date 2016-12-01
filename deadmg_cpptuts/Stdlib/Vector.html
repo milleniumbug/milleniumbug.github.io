@@ -1,0 +1,45 @@
+
+
+
+
+<h1><code>std::vector</code></h1>
+<p>Previously, we met a compile-time sized array. Now, we will meet a dynamically sized array- <code>std::vector&lt;T&gt;</code>, which lives in <code>&lt;vector&gt;</code>. <code>std::vector&lt;T&gt;</code> is guaranteed to be a single contiguous block of memory, and offers ridiculously fast random access, just like <code>std::array</code>. However, <code>std::vector&lt;T&gt;</code> may hold any number of items, only bounded by the available memory. In addition, we meet the concept of pointer (and later, iterator) invalidation. A few of the more simple and important members are shown below:</p>
+<div class="well"><code>
+#include &lt;iostream&gt;<br/>
+#include &lt;vector&gt;<br/>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::vector&lt;int&gt; x;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;x.push_back(5); // Adds one item to the vector.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; x.size(); // Tells you how many items are in the vector<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;x.clear(); // Remove all contents from the vector.<br/>
+}<br/>
+</code></div><p>
+Here's pointer invalidation for you:</p><div class="well"><code>
+#include &lt;iostream&gt;<br/>
+#include &lt;vector&gt;<br/>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::vector&lt;int&gt; x;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;for(int i = 0; i &lt; 15; i++)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;x.push_back(5); // Add plenty of items<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;int* ptr = &x[14]; // Take a pointer to the last element.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;x.push_back(5);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; *ptr; // UB<br/>
+}<br/>
+</code></div>
+<p>Why is this UB? The simple answer is resizing. Each vector has a block of memory, enough for <code>capacity()</code> number of items. When you exceed this capacity, the <code>vector</code> must allocate a new block to hold the extra storage. But since it's guaranteed to be a single contiguous block, then we must copy over our previous contents and deallocate the old block. Since the old block has been deallocated, then <code>ptr</code> now points to invalid memory. The moral of this story is, don't point or refer to a vector's contents unless you're sure it's not being mutated, else bad things happen. Different Standard classes have different rules about this, and <code>vector</code> is the most invalidation-happy. Any mutation may cause pointer or reference invalidation. This also means that <code>vector</code>, like all Standard containers, requires its argument to be movable.</p>
+<p>You might ask why this is designed this way. The unfortunate answer is that C functions take arrays of items (i.e., single contiguous memory blocks). If <code>vector</code> were designed any other way, you couldn't use it to provide data to a C function that expects an array. You can access this through <code>data()</code>, which provides a pointer to the first element. C functions that take arrays usually take a pointer to the first element, and a size.</p>
+<p>In addition, <code>std::string</code> has the same behaviour and for the same reason. You can also index into a <code>std::string</code> and take a pointer to it's elements, but this is also risky and it has the same iterator invalidation rules. In fact, it could (and often has been) argued that <code>std::string</code> is nothing more than a wrapper over a <code>std::vector&lt;char&gt;</code>. </p>
+<p>C functions which take strings (always unhelpful strings) take a pointer to the first element, which you can access through <code>c_str()</code> on a <code>std::string</code>. They do not usually require the size.</p>
+<p>Fortunately, when not dealing with C functions, the Standard Library provides a superior alternative- <code>std::deque</code>.</p>
+<p>Finally, do not ever use <code>std::vector&lt;bool&gt;</code>. The Committee introduced a "helpful" specialization for it which is completely broken, but they can't remove for backwards compatibility. Fun stuff. I commonly use <code>std::vector&lt;char&gt;</code> as a substitute. The other containers don't have this problem.</p>
+<p>Exercise: How fast does <code>std::vector</code> grow?</p>
+<ul class="pager">
+  <li class="previous">
+    <a href="Array.html">&larr; <code>std::array</code></a>
+  </li>
+  <li class="next">
+    <a href="Deque.html"><code>std::deque</code> &rarr;</a>
+  </li>
+</ul>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

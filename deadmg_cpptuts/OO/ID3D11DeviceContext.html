@@ -1,0 +1,49 @@
+﻿
+
+
+
+<h1><code>ID3D11DeviceContext</code></h1>
+<p>Direct3D is the 3D rendering API on Microsoft Windows. The DeviceContext is used for drawing. The <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/ff476407(v=vs.85).html">Draw</a> function draws vertices to the current render target.</p>
+<p>Unfortunately, you might notice a bit of a problem with this function- namely, there are no vertices anywhere near here. Nor any shaders, render states, textures, or anything like that which you may well need to draw something on a 3D pipeline.</p>
+<p>The DeviceContext object has methods which require you to set these in internal variables before you can actually draw something. You have no idea if they're set correctly except to hope that you got it right. 
+    Plus, of course, you need to remember each time what needs setting. This is obviously error-prone. Instead, you might suggest a Draw function with a different signature.</p>
+<div class="well"><code>
+void Draw(<br />
+&nbsp;&nbsp;&nbsp;&nbsp;ID3D11VertexShader*,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;ID3D11PixelShader*,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;ID3D11RenderState*,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;// etc<br />
+);
+</code></div>
+<p>Now it's impossible for any poor sucker to not provide the relevant details. In most applications, performance is not a huge consideration. But for 3D games, it's very important- many of them hit barriers with 
+    regards to what they can squeeze in their 30 or 60 frames per second. To enhance the performance, we consider a second approach- parameter grouping. Here we simply define an fresh immutable class which contains 
+    all the parameters, and then we deal with that. So let's see what we might be talking about.</p>
+<div class="well"><code>
+class DrawParameters {<br />
+public:<br />
+&nbsp;&nbsp;&nbsp;&nbsp;virtual void Draw(unsigned int vertexcount, unsigned int startvertexlocation) = 0;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;virtual ~DrawParameters();<br />
+};<br />
+unique_ptr&lt;DrawParameters&gt CreateDrawParams(<br />
+&nbsp;&nbsp;&nbsp;&nbsp;ID3D11VertexShader*,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;ID3D11PixelShader*,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;ID3D11RenderState*,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;// etc<br />
+);
+</code></div>
+<p>Not only do we retain the advantage of the compiler checking that we provided all the necessary arguments for our call, but we have gained three more. The first is that now we can consider all our parameters 
+    as one single element, making storing and manipulating them easier. The second is that if a new kind of shader is added, we only need to change the CreateDrawParams call site- every place which calls Draw does 
+    not need to be altered. Finally and most importantly, as all our parameters are set as a group. the graphics card driver has every opportunity to perform every scrap of validation and optimization it wants, 
+    because the parameters are immutable, so the effort won't be wasted. This approach is common in other areas, for example the IDWriteTextLayout.
+</p>
+<p>The moral of the story is, function parameters should be parameters. They should not be set as magical invisible objects in your private APIs. If you have too many of them, consider creating another class 
+    to hold them.
+</p>
+<ul class="pager">
+  <li class="previous">
+      <a href="iostreams.html">&larr; <code>iostreams</code></a>
+  </li>
+</ul>
+
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

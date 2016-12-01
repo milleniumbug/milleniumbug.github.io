@@ -1,0 +1,124 @@
+﻿
+
+
+
+<h1>Expression Templates</h1>
+<p>An expression template is one of the neatest things you can do with templates. First, we'll need to introduce the <i>curiously recurring template pattern</i> (CRTP). In addition, we meet <code>static_assert.</code></p>
+<div class="well"><code>
+template&lt;typename Derived&gt; class Base {<br />
+&nbsp;&nbsp;&nbsp;&nbsp;static_assert(std::is_base_of&lt;Base&lt;Derived&gt;, Derived&gt;::value,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"The derived class must inherit from base&lt;derived&gt;.");<br />
+public:<br />
+};<br />
+class Derived : public Base&lt;Derived&gt; {<br />
+};<br />
+</code></div>
+<p>Here, the derived class passes <i>itself</i> as a template parameter to one of its' base classes. This permits the derived class to inherit strongly-typed functionality from the base class.</p>
+<p><code>static_assert</code> is a C++11 language feature. It takes a compile-time boolean value as the first parameter, and a string as the second. If the value is false, compilation fails, and the error message 
+    given is the string. This effectively allows us to give quick and simple errors when dealing with templates if the user has not held up their end of the bargain and implemented the appropriate interface- assuming 
+    that we can use a compile-time check for such. Here, the Standard has defined is_base_of for us.
+</p>
+<p>Now, the principle problem which expression templates solves is a lack of information. Consider the following code:</p>
+<div class="well"><code>
+int main() {<br />
+&nbsp;&nbsp;&nbsp;&nbsp;std::string a, b, c, d, e, f;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;std::cin >> a >> b >> c >> d >> e >> f;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;std::cout << a + b + c + d + e + f;<br />
+}<br />
+</code></div>
+<p>What is the complexity of concatenating these strings? Well, the output size is O(n), so you might suggest that. But it's actually O(n^2) (and was O(n^4) or so before move semantics). This is because each time 
+    you concatenate the string, you're performing an O(n) concatenation- and then we're doing that O(n) times. All those temporary <code>std::string</code> objects we're creating to store the intermediate results 
+    are wasted. There's no way around that, because if you want to use <code>operator+</code> then you can only know about two arguments, the lhs and rhs- but, well, the <i>type</i> of the lhs and rhs and return 
+    value, they're completely flexible. So we encode information about the expression <i>into the type</i>. This permits us to know much more about the entire expression and context when evaluating it, giving rise 
+    to superior performance. Here, I'll focus on the expression template part only, and skip most of the string-related part.
+</p>
+<p>Expression templates are based on information about expressions. So first, we need to decide what information we need. Here, we decide that we need two things- the size of the data, and how to append it.</p>
+<div class="well"><code>
+template&lt;typename Derived&gt; class ConcatenationExpressionBase {<br />
+public:<br />
+&nbsp;&nbsp;&nbsp;&nbsp;std::size_t size() const {<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return static_cast&lt;const Derived*&gt;(this)->size();<br />
+&nbsp;&nbsp;&nbsp;&nbsp;}<br />
+&nbsp;&nbsp;&nbsp;&nbsp;void add_to_string(our_string& result) const {<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;static_cast&lt;const Derived*&gt;(this)->add_to_string(result);<br />
+&nbsp;&nbsp;&nbsp;&nbsp;}<br />
+};</code></div>
+<p>Next, we need a class that will give out that information for everything we wish to concatenate. For this sample, we'll show only our_string, but a real implementation can include arbitrary classes here.</p>
+<div class="well"><code>
+class ConcatenateString : public ConcatenationExpressionBase&lt;ConcatenateString&gt; {<br />
+public:<br />
+&nbsp;&nbsp;&nbsp;&nbsp;ConcatenateString(const our_string* str)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: p(str) {}<br />
+&nbsp;&nbsp;&nbsp;&nbsp;ConcatenateString(const ConcatenateString& other)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: p(other.p) {}<br />
+&nbsp;&nbsp;&nbsp;&nbsp;const our_string* p;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;std::size_t size() const {<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return p->size();<br />
+&nbsp;&nbsp;&nbsp;&nbsp;}<br />
+&nbsp;&nbsp;&nbsp;&nbsp;add_to_string(our_string& result) const {<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;result.append(*p);<br />
+&nbsp;&nbsp;&nbsp;&nbsp;}<br />
+};</code></div>
+<p>Next, we need a class that will permit us to deal with multiple items as one item. This is recursive- the final product will be like, <code>result&lt;result&lt;result&lt;string, string&gt;, string&gt;, string&gt;</code></p>
+<div class="well"><code>
+template&lt;typename LHS, typename RHS&gt; class ConcatResult : public ConcatenationExpressionBase&lt;ConcatResult&lt;LHS, RHS&gt;&gt; {<br />
+public:<br />
+&nbsp;&nbsp;&nbsp;&nbsp;ConcatResult(LHS l, RHS r)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: lhs(l), rhs(r) {}<br />
+&nbsp;&nbsp;&nbsp;&nbsp;ConcatResult(const ConcatResult& other)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: lhs(other.lhs), rhs(other.rhs) {}<br />
+&nbsp;&nbsp;&nbsp;&nbsp;LHS lhs;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;RHS rhs;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;std::size_t size() const {<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return lhs.size() + rhs.size();<br />
+&nbsp;&nbsp;&nbsp;&nbsp;}<br />
+&nbsp;&nbsp;&nbsp;&nbsp;void add_to_string(our_string& result) const {<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;lhs.add_to_string(result);<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;rhs.add_to_string(result);<br />
+&nbsp;&nbsp;&nbsp;&nbsp;}<br />
+};</code></div>
+<p>Finally, we need the operators that will make all of this accessible and execute- starting with our concatenation operator. They perform the encoding into the data structure we have just described.</p>
+<div class="well"><code>
+ConcatResult&lt;ConcatenateString, ConcatenateString&gt; <br />
+operator+(const our_string& lhs, const our_string& rhs) {<br />
+&nbsp;&nbsp;&nbsp;&nbsp;return ConcatResult&lt;ConcatenateString, ConcatenateString&gt;(&lhs, &rhs);<br />
+}<br />
+template&lt;typename LHS&gt; ConcatResult&lt;LHS, ConcatenateString&gt; <br />
+operator+(const ConcatenationExpressionBase&lt;LHS&gt;& lhs, const our_string& rhs) {<br />
+&nbsp;&nbsp;&nbsp;&nbsp;return ConcatResult&lt;LHS, ConcatenateString&gt(static_cast&lt;const LHS&&gt;(lhs), &rhs);<br />
+}<br />
+template&lt;typename RHS&gt; ConcatResult&lt;ConcatenateString, RHS&gt; <br />
+operator+(const our_string& lhs, const ConcatenationExpressionBase&lt;RHS&gt;& rhs) {<br />
+&nbsp;&nbsp;&nbsp;&nbsp;return ConcatResult&lt;ConcatenateString, RHS&gt;(&lhs, static_cast&lt;const RHS&&gt;(rhs));<br />
+}<br />
+template&lt;typename LHS, typename RHS&gt; ConcatResult&lt;LHS, RHS&gt; <br />
+operator+(const ConcatenationExpressionBase&lt;LHS&gt;& lhs, <br />
+&nbsp;&nbsp;&nbsp;&nbsp;const ConcatenationExpressionBase&lt;RHS&gt;& rhs) <br />
+{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;return ConcatResult&lt;LHS, RHS&gt;(static_cast&lt;const LHS&&gt;(lhs), <br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;static_cast&lt;const RHS&&gt;(rhs));<br />
+}<br />
+template&lt;typename T&gt; std::ostream& operator<<(std::ostream& lhs, const ConcatenationExpressionBase&lt;T&gt;& rhs) {<br />
+&nbsp;&nbsp;&nbsp;&nbsp;our_string result;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;result.reserve(rhs.size());<br />
+&nbsp;&nbsp;&nbsp;&nbsp;rhs.add_to_string(result);<br />
+&nbsp;&nbsp;&nbsp;&nbsp;return lhs << result;<br />
+}
+</code></div>
+<p>The important thing to take away is that the operators encode the expression into the type system. The expression is only actually evaluated later when we have all the available information- and this enables 
+    us to achieve the maximum effiency. There is no unnecessary reallocations, no additional copying.
+</p>
+<p>Expression templates are an essential optimization technique for various libraries. But they also don't interact well with type deduction- after all, <code>decltype(a + b)</code> is not <code>our_string</code>, 
+    and <code>auto</code> won't give an <code>our_string</code> object. This is a very unfortunate situation. In addition, none of the Standard types which could benefit from this technique actually employ it.
+</p>        
+<ul class="pager">
+  <li class="previous">
+      <a href="Variadics.html">&larr; Variadic Templates</a>
+  </li>
+  <li class="next">
+      <a href="../OO/index.html">Object Orientation &rarr;</a>
+  </li>
+</ul>
+
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

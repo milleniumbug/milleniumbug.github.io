@@ -1,0 +1,31 @@
+﻿
+
+
+
+
+<h1>Most Vexing Parse</h1>
+<p>The Most Vexing Parse, or MVP, is another grammatical ambiguity in C++. Consider the following function:</p>
+<div class="well"><code>
+int main() {<br />
+&nbsp;&nbsp;&nbsp;&nbsp;int x();<br />
+}
+</code></div>
+<p>You might reasonably conclude that <code>x</code> is a default-constructed <code>int</code>. Sorry, but no. It's actually a <i>function declaration</i>, which you may or may not have met already. Essentially, there 
+is no real reason to do this, but strictly it's legal, and ambiguous, so the C++ Standard kindly defines that it should always be resolved to the one that nobody sane ever does, instead of the one that people do all 
+the time. This isn't so bad, since you could just omit the parenthesis, but it gets worse when using temporaries, because you could have a <i>function declaration</i> which takes another function type as an argument.</p>
+<div class="well"><code>
+int main() {<br />
+&nbsp;&nbsp;&nbsp;&nbsp;int x(int());<br />
+}</code></div>
+<p><code>int</code> initialized from rvalue <code>int</code>, or function named <code>x</code> returning int and taking another function which takes nothing and returns <code>int</code>? Owch. To resolve this the way 
+that you want, add additional parenthesis around the intended argument.</p>
+<div class="well"><code>
+int main() {<br />
+&nbsp;&nbsp;&nbsp;&nbsp;int x((int()));<br />
+}</code></div>
+<p>Now it's definitely an <code>int</code> initialized from a temporary <code>int</code>. MVP isn't <i>that</i> easy to run into but if your compiler complains that a variable is a function, then you know you've 
+found it.</p>
+<p>Just to add to the fun, you can't even <a href="Initialization.html">omit the parens for some types.</a></p>
+
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

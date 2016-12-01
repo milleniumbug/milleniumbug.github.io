@@ -1,0 +1,59 @@
+
+
+<h1><code>#include</code></h1>
+<p>
+The preprocessor is the very first stage of compiling a C++ program. It is a textual substitution mechanism. It deals not in types, functions, and variables, but tokens and macros. All preprocessor directives are preceeded by the <code>#</code> symbol. We'll start with the one we've already met- <code>#include</code>.<br/>
+<br/>
+Previously, I described how you have to declare every function you wish to call that isn't defined right there- and more, for templates. This is a <i>very</i> large quantity of text that needs duplicating across <i>many</i> source files. Doing it by hand would be simply impossible. So the <code>#include</code> directive simply pastes text from one file to another. Typically, programmers create two kinds of files- header, and source. A header file is a descriptive file that includes declarations and templates and such things, and source files contain definitions. When we <code>#include &lt;memory&gt;</code>, the preprocessor pastes in the definition of <code>std::unique_ptr</code>, <code>std::shared_ptr</code>, and all the rest into our source file. The argument to <code>#include</code> is actually a filepath, and it usually goes in quotes. The difference between angle brackets and quotes is not defined by the Standard, but typically, angle brackets are used for headers provided by the implementation, such as those of the Standard library (like <code>memory</code>), and quotes are used for user-defined headers. We can put the preprocessor to work to avoid duplicating our own code. Usually, source files are given the extension <code>.cpp</code> and header files <code>.h</code>, but the Standard mandates no file naming scheme or extension. You can use whatever you like, but I usually just use <code>.h</code>, because the Microsoft toolchain (my primary) doesn't cope well with creative header extensions. It's important that headers do not circularly include each other, and each one includes it's dependencies (as few as possible). Circular includes just make your program fail to compile, and fewer dependencies makes for easier time adapting to changes (and faster compilation).</p><div class="well"><code>
+// X.h<br/>
+template&lt;typename T&gt; class X {};<br/>
+// main.cpp<br/>
+#include &quot;X.h&quot; // defines class X for us.<br/>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;X&lt;int&gt; var; // All good.<br/>
+}<br/>
+// foo.cpp<br/>
+#include &quot;X.h&quot;<br/>
+void foo() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;X&lt;void&gt; var; // Also good<br/>
+}<br/>
+</code></div><p>
+What's to be most aware of is that <code>#include</code> is a simple <i>text pasting mechanism</i>.</p>
+<div class="well"><code>
+// X.h<br />
+class X {<br />
+} // Oops, forgot semicolon<br />
+// main.cpp
+#include "X.h"
+int main() {<br />
+&nbsp;&nbsp;&nbsp;&nbsp;// Compiler spews a very strange error about bad syntax.<br />
+}<br />
+</code></div>
+<p> This can introduce <i>fun</i> when dealing with multiple headers. For example,</p>
+<div class="well"><code>
+// X.h<br/>
+#include &lt;vector&gt;<br/>
+template&lt;typename T&gt; class X { std::vector&lt;int&gt; ints; };<br/>
+// Y.h<br/>
+#include &lt;vector&gt;<br/>
+template&lt;typename T&gt; class Y { std::vector&lt;int&gt; ints; };<br/>
+</code></div><p>
+We have to include <code>&lt;vector&gt;</code> in each. Else, our code could not work if someone were to use only the X class or only the Y class- or indeed, simply include them in the wrong order, or not together, or something like that. Headers should not depend on being included in any given order, and they should include all their own dependencies- they should be independent files, declaring separate bits of code.</p><div class="well"><code>
+// main.cpp<br/>
+#include &quot;X.h&quot;<br/>
+#include &quot;Y.h&quot;<br/>
+</code></div><p>
+Now we have included <code>&lt;vector&gt;</code> twice. This header defines the Standard template class <code>std::vector</code>. But curiously, there's no error- even though defining it twice in one TU <i>is</i> an error. This is because <code>&lt;vector&gt;</code> is protected by an include guard. An include guard is where if the header is included after the first time, nothing happens (i.e., no text is introduced). This makes multiple inclusions safe. Guards should really be the default- but there are some uses, called xmacros, for headers which are not guarded. XMacros are usually reserved for ugly C hacks and not described in the primary part of these tutorials. To understand how a guard is implemented, we will need to understand a few more preprocessor directives.<br/>
+<br/>
+Exercise: Find out what the search paths are for your implementation using "", and compile a simple program using more than one source file sharing inline code, such as a template.<br/>
+</p>
+<ul class="pager">
+  <li class="previous">
+<a href="ODR.html">&larr; One Definition Rule</a>
+  </li>
+  <li class="next">
+<a href="Define.html"><code>#define</code> &rarr;</a>
+  </li>
+</ul>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

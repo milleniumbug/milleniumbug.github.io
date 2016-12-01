@@ -1,0 +1,20 @@
+﻿
+
+
+<li><a href="Preparation/index.html">Preparation Index</a></li>
+
+    
+<li class="nav-header">Tools</li>
+<li><a href="Compiler.html">Compiler</a></li>
+<li><a href="SourceControl.html">Source Control</a></li>
+<li class="nav-header">Knowledge</li>
+<li><a href="Dialects.html">Dialects</a></li>
+<li><a href="CPP11.html">C++11</a></li>
+
+
+
+
+
+
+
+

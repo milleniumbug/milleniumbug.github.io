@@ -1,0 +1,33 @@
+
+
+
+
+<p>
+Previously, in declarations and definitions, we learned that you could take a pointer to an incomplete type. This gives yield to the simplest encapsulation technique you can imagine- simply never define the type except in your own library, and only deal with pointers.</p><div class="well"><code>
+struct handle_type;<br/>
+handle_type* allocate();<br/>
+void deallocate(handle_type*);<br/>
+</code></div><p>
+This is known as an opaque pointer, as it's impossible for the user code to determine or access it's contents. This is basically inheritance, but implemented with a C bent.<br/>
+<br/>
+However, this is not strictly correct C. In C, types, structs, and enums all shared different namespaces.</p><div class="well"><code>
+struct X {};<br/>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;X x; // Illegal- no type named X.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;struct X x; // legal<br/>
+}<br/>
+</code></div><p>
+This is obviously quite silly and nobody really had time to deal with it, which is why it was deprecated in C++. So it was very common to define structs as types when they were created. This goes along the lines of</p><div class="well"><code>
+typedef struct {} X;<br/>
+</code></div><p>
+This defines the anonymous struct to be a type named X. This makes our lives much simpler and more direct. But you <i>can</i> find old code referring to structs as <code>struct X</code> rather than <code>X</code>. Such is not strictly illegal in C++ but heavily frowned upon. You can do the same with <code>class</code> and <code>enum</code>. You can also find variants, like</p><div class="well"><code>
+typedef struct {} X, *PX;<br/>
+</code></div><p>
+This is basically equivalent to</p><div class="well"><code>
+typedef struct {} X;<br/>
+typedef X* PX;<br/>
+</code></div><p>
+But needlessly squeezed on to one line for fun and minimum clarity.<br/>
+</p>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

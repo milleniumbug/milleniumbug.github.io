@@ -1,0 +1,56 @@
+
+
+
+
+    <h1>Variadic Templates</h1>
+<p>
+A variadic template is a system by which you can take as many template arguments as you want or need within a single function overload or class. A variadic template is indicated by <code>...</code>- that is, <code>typename... T</code>. They are zero to N arguments in one <i>parameter pack</i>.</p><div class="well"><code>
+template&lt;typename... T&gt; class X {}; // T is a parameter pack<br/>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;X&lt;&gt; x; // 0 arguments<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;X&lt;void, X&lt;int&gt;, int&gt; x2; // Also valid.<br/>
+}<br/>
+</code></div><p>
+There are two primary ways of accessing the contents of such a thing- through <i>expansion</i> and <i>recursion</i>. Expansion is simply where the compiler repeats code for each argument.</p><div class="well"><code>
+template&lt;typename... T&gt; void f(T&&... args) { // Take 1 rvalue reference to X, for each X in T.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;other_f(std::forward&lt;T&gt;(args)...); // Expansion using ...<br/>
+}<br/>
+</code></div><p>
+Here, we combine <i>perfect forwarding</i> with <i>variadic templates</i>. Note that the position of <code>...</code> is important- it effectively means "Repeat this expression for each type <code>T</code> and argument <code>arg</code> in the parameter pack and <code>args</code>". This means that we passed the result of <code>std::forward</code>, for each argument, to one single call of <code>other_f</code>. If we want multiple calls of <code>other_f</code>, we need to use <i>recursion</i>. This is similar to how we've used it in the past.</p><div class="well"><code>
+template&lt;typename... T&gt; void f() {} // Base case- 0 arguments<br/>
+template&lt;typename head, typename... tail&gt; void f(head&& h, tail&&... t) {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; std::forward&lt;head&gt;(h);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;return f(std::forward&lt;tail&gt;(t)...);<br/>
+}<br/>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;f(&quot;Hai\n&quot;, &quot;Variadics\n&quot;, 123, 5);<br/>
+}<br/>
+</code></div><p>
+Note that the compiler prefers to match as little as possible in the variadic argument. Since we provide an overload which takes 1 argument <i>and</i> variadic, the compiler has to put less in the parameter pack for the second overload, and it is preferred- except when the pack is now empty, when it is forced to pick the first overload.<br/>
+<br/>
+Unfortunately, the cases where you can use expansion are limited. But variadics are still very powerful and enable us to generalize some cases which we previously could not have dealt with. For example, our <code>is_callable</code> type trait.</p><div class="well"><code>
+template&lt;typename sig, typename functor&gt; struct is_callable;<br/>
+template&lt;typename Ret, typename... Arg, typename functor&gt; <br/>
+struct is_callable&lt;Ret(Arg...), functor&gt; { // partial spec<br/>
+private:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;struct no {};<br/>
+public:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;template&lt;typename U&gt; static auto f(std::nullptr_t) -&gt; decltype(std::declval&lt;U&gt;()(std::declval&lt;Arg&gt;()...));<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;template&lt;typename U&gt; static no f(...);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;static const int value = std::is_convertible&lt;decltype(f&lt;functor&gt;(nullptr)), Ret&gt;::value;<br/>
+};<br/>
+</code></div><p>
+Now it works for any number of arguments- and we can make a similar adjustment for <code>my_func</code>. This machinery powers some of the more advanced functionality in the C++11 Standard library.<br/>
+<br/>
+Now we'll meet the next generation of TMP- <code>constexpr</code>.<br/>
+</p>    
+<ul class="pager">
+  <li class="previous">
+      <a href="SFINAE.html">&larr; SFINAE</a>
+  </li>
+  <li class="next">
+      <a href="ExpressionTemplates.html">Expression Templates &rarr;</a>
+  </li>
+</ul>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

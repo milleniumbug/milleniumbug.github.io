@@ -1,0 +1,29 @@
+﻿
+
+
+
+
+<h1>Caches and Latency</h1>
+<p>A CPU cache is a fairly simple (conceptually) memory optimization done in hardware. However, as we will soon see, the many implementation details used here can have serious consequences for our program.</p>
+<p>As you are probably aware, a CPU has a clock speed. This speed is, say, 3GHz. In principle, each cycle, the CPU performs one instruction (although in reality it can be quite a bit more). Simple instructions all take 
+    one cycle (or possibly less), such as integral operations (except div/mul/mod). Unfortunately, when we consider other operations, this time is much higher. For example, the latency of loading memory from RAM can be 
+    as high as four hundred cycles. This is what occurs when you de-reference a pointer. This is because the CPU is very, very fast, but the RAM is a lot slower.
+</p>
+<p>As a response, the CPU caches recently-used addresses in an on-die cache. Cache latency is much lower than RAM latency- just a few cycles. In addition, the CPU can often process other instructions whilst waiting for 
+    data from memory. This, directly, means that the more you use the same piece of memory, the faster your program will execute. Critical is the definition of "piece". This is, formally, known as a cache line. Each 
+    cache line is loaded as a discrete chunk. On current processors it is typically 64bytes. If you read one address anywhere in the line, then the whole line is fetched. Alignment penalties occur here, where if you try 
+    to fetch data that lies across cache line boundary, you will have to load both. In addition, the CPU can "prefetch" lines- or in other words, it can attempt to load lines into cache before you strictly need them. This 
+    can allow it to have the line ready in advance- if it knows the address.
+</p>
+<p>So, just as an example, let's compare iterating through a linked list, and an array. Initially, the CPU will have to load the first element of both through a pointer. But there the similarities end. For the array, the 
+    CPU just loaded 64bytes of elements, so it can execute on all of those whilst it waits for the next elements. In addition, as the range is contiguous, the CPU can easily predict the next addresses needed, and issue 
+    requests for them ahead of time so that they are ready when necessary. In constrast, the linked-list only loads one element per request. In addition, the CPU has to wait for the request to finish before knowing where 
+    to request the next piece, so it can't issue any requests ahead of time. This means the CPU must wait the full latency for every element. So whilst, strictly, the algorithmic complexity of iterating through a linked 
+    list and an array are both O(N), the cache effects of the linked list destroy it's iterating performance. This is why you should never, ever use std::list, unless you're very desperate. The cache effects of lists means
+    that their superior algorithmic complexity doesn't actually mean that much in many real-world use cases.
+</p>
+<p>Special care must be taken with multidimensional arrays to iterate through them in the correct order- else you can end up accessing them in a non-linear fashion.</p>
+<p>As a brief side note, in the distant past, memory speeds were far faster compared to the CPU- almost 1 cycle for indirection. That's why old code tends to favour a lot more indirection- especially linked lists.</p>
+
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

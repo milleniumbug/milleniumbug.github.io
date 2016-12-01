@@ -1,0 +1,49 @@
+
+
+
+
+<h1>Perfect Forwarding</h1>
+<p>
+Previously, I said that rvalue references bind to rvalues. This was actually a bit of a simplification (although true). If you ever attempted to take an rvalue reference to a template parameter, you would have noticed a most curious outcome- namely, that it would bind to <i>anything</i>.</p><div class="well"><code>
+template&lt;typename T&gt; void f(T&& t) {}<br/>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;int x = 0;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;f(x); // lvalue binds to rvalue reference- wat?<br/>
+}<br/>
+</code></div><p>
+You can get the same situation by using <code>auto&& x = expr;</code>- you can use it for any <code>expr</code>. This invokes something known as "Perfect Forwarding". If we didn't care whether our argument was an lvalue or an rvalue, we could take a <code>const T&</code>. Unfortunately, this permanently lost that information. If we had another function underneath that we passed that argument to that <i>did</i> care, we were stuffed. Particularly at risk here was constructors, because it's so common to want to forward to them.</p><div class="well"><code>
+void f(int&& i);<br/>
+void f(int& i);<br/>
+template&lt;typename T&gt; void forward(const T& arg) {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;f(arg); // Not gonna work- arg is always const lvalue.<br/>
+}<br/>
+</code></div><p>
+We could have overloaded <code>forward</code> for all arguments. But this is exponential in the number of arguments we wish to forward on- an unsustainable solution.<br/>
+<br/>
+So in C++11 with the introduction of the rvalue reference was also introduced <i>reference collapsing</i>. These rules govern what happens when you have a reference to a reference type, which previously was illegal. Now, they collapse to produce one result type. Here's a simple rule:</p><div class="well"><code>
+T& T& -&gt; T&<br/>
+T& T&& -&gt; T&<br/>
+T&& T& -&gt; T&<br/>
+T&& T&& -&gt; T&&<br/>
+</code></div><p>
+In fact, <code>x T&& -&gt; x</code>. This is what makes <code>T&&</code> the perfect forwarding. If we have</p><div class="well"><code>
+template&lt;typename T&gt; void forward(T&& t) {<br/>
+</code></div>
+<p>
+ <br/>
+Here, we can inspect <code>T</code> to determine whether the <i>source</i> was an lvalue or an rvalue. If it was an rvalue of type <code>U</code>, then <code>T</code> will be <code>U</code>. Else, <code>T</code> will be <code>U&</code> or <code>const U&</code> as necessary. And we can use this information to change <code>t</code> into an lvalue or rvalue, through the utility function <code>std::forward</code>. When <code>std::forward</code> is invoked, you must pass <code>T</code> explicitly, and the result is an rvalue if the argument was originally an rvalue, and else an lvalue. This means that we can transparently take objects and forward them on without losing <code>const</code> qualifiers, or value category. Note that this depends on <code>T</code> being deduced by the compiler- you could set it explicitly but that would be a headache. </p><div class="well"><code>
+&nbsp;&nbsp;&nbsp;&nbsp;f(std::forward&lt;T&gt;(t));<br/>
+}<br/>
+</code></div><p>
+Remember that <code>f</code> might use this rvalue, if it was one, to move state away from the object using move semantics. Thus, <code>t</code> might now be a moved-from object, and you can't depend on it's contents, so only do this when you're done with it's current state.<br/>
+</p>
+<ul class="pager">
+  <li class="previous">
+      <a href="TemplateTypename.html">&larr; <code>template</code> and <code>typename</code></a>
+  </li>
+  <li class="next">
+      <a href="SFINAE.html">SFINAE &rarr;</a>
+  </li>
+</ul>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

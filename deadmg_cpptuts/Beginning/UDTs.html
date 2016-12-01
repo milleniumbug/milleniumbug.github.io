@@ -1,0 +1,50 @@
+
+
+<h1>User Defined Types</h1>
+<p>Originally, I said that all variables were statically typed. But I didn't really go into what a type <i>is</i>.</p>
+<p>In short, a type is a piece of information, known to the compiler, which dicates the operations you can perform on a block of memory (of known size). Effectively, it labels each piece of your program as having certain semantics (behaviours). For example, when you have an <code>int</code> variable, then the compiler <i>knows</i> that actually, this block of memory is an integer, and it's a bad idea for you to attempt to pretend it's a piece of text or an Internet connection or a window or anything else. This means that if you try to do something bad with it, the compiler prevents you (you can actually override it, but this is a stupendously bad idea). But it knows that it's perfectly valid for you to attempt to add it to another integer, because that's a fine thing to do with an integer. Because the compiler checks all types for validity before the program executes, the simple rule of creating programs with fewer errors is to make more of your semantics go through the type system. The more expressive types you have, the less error-prone your program will be.</p>
+<p>In order to express our own semantics, we will need to define our own types. To do this, we will use most of the tools we have previously encountered all in one place. New types are introduced with the <code>class</code> keyword. They contain six special functions.</p>
+<div class="well"><code>
+class my_class {<br/>
+public:<br/>
+</code></div>
+<p>The <code>public</code> modifier means that any code is allowed to access what follows. Determining exactly what should and should not go in the <code>public</code> section is a long story that we can cover later. What's more important is to focus on the simple mechanics of the class. Each variable is constructed. If we want to, we can define a special function - a constructor- which is executed here. Like regular functions, constructors can be overloaded and they can take arguments, and they can also be templates. However, there is no syntax to provide a template argument to a constructor, so effectively they can only be inferred arguments.</p>
+<div class="well"><code>
+&nbsp;&nbsp;&nbsp;&nbsp;my_class() {}<br/>
+</code></div>
+<p>This defines the "default" constructor. This constructor will be called when no arguments are passed. Under some circumstances, the compiler will create one for us. For example, <code>my_class m;</code> will call this constructor.</p>
+<div class="well"><code>
+&nbsp;&nbsp;&nbsp;&nbsp;my_class(const my_class& other) {}<br/>
+</code></div>
+<p>This defines the "copy" constructor. This constructor will be called when the user attempts to copy the class. This happens frequently- when it's passed by value as a function argument, for example. Some classes are not copyable. The compiler will also attempt to generate this for us. Such as <code>my_class m2(m);</code></p>
+<div class="well"><code>
+&nbsp;&nbsp;&nbsp;&nbsp;my_class(my_class&& other) {}<br/>
+</code></div>
+<p>This defines the "move" constructor. This constructor will be called when the user attempts to construct a new variable from an object which is about to be destroyed. A common example is when you return such an object by value from a function. The compiler will extremely rarely (for backwards compatibility reasons) attempt to generate this for us. <code>my_class m3((my_class()));</code> calls this constructor. The extra parenthesis are not redundant- see <a href="../GeneralFail/MostVexingParse.html">Most Vexing Parse</a>.</p>
+<div class="well"><code>
+&nbsp;&nbsp;&nbsp;&nbsp;~my_class() {}<br/>
+</code></div>
+<p>This defines the destructor. The destructor is always called when the variable's life is over. Most types do not need a user-defined destructor. The compiler will always define this for us- the destructor of a class <i>always</i> exists. In addition, the compiler always inserts some specific code into the destructor, even if you add additional behaviour in the function body. Neither constructors nor destructors can return values.</p>
+<div class="well"><code>
+&nbsp;&nbsp;&nbsp;&nbsp;my_class& operator=(const my_class& other) { return *this; } // copy assignment operator<br/>
+</code></div>
+<p>This one is quite new as well. This is an "operator overload". When considering complex user-defined types, then the most natural use case is simply to assign them to each other. But just as direct copy construction, this can cause problems if not correctly handled. So C++ introduces operator overloads. This basically allows you to replace an operator with a custom function call with pre-defined arguments. Most operators in C++ can be overloaded. They can also be templates. Whilst strictly, it is possible to provide template arguments to them, it's very arduous and not possible through the "natural" call syntax. <code>m = m2;</code> calls this function. It is also necessary to consider the semantics of the <code>this</code> keyword, in the next tutorial.</p>
+<div class="well"><code>
+&nbsp;&nbsp;&nbsp;&nbsp;my_class& operator=(my_class&& other) { return *this; } // move assignment operator<br/>
+</code></div>
+<p>This is for assignment to rvalues- such as <code>m = my_class();</code>.</p>
+<div class="well"><code>
+};<br/>
+</code></div>
+<p>Note that unlike functions, classes require a semicolon at the end.</p>
+<p>Exercise: What happens if you declare a variable such as <code>my_class m();</code>?</p>
+<ul class="pager">
+  <li class="previous">
+    <a href="Overloading.html">&larr; Overloading</a>
+  </li>
+  <li class="next">
+    <a href="Classes.html">Classes &rarr;</a>
+  </li>
+</ul>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

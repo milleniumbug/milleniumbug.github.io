@@ -1,0 +1,47 @@
+
+
+<h1>Exceptions</h1>
+<p>The root need for exceptions comes from the need to handle errors. As we saw earlier, it's awfully easy to write</p><div class="well"><code>
+int i;<br/>
+std::cin &gt;&gt; i;<br/>
+</code></div><p>
+without ever checking whether or not the operation succeeded. Worse, if it failed, and you read <code>i</code>, you get instant UB. This means that you, the programmer, must always remember to check for errors. In the case of <code>std::cin</code>, we wrapped it in a function that simply repeated the attempt if it failed- but this isn't possible for the vast majority of functionality. In addition, if we wrote a function that depended on reading a valid <code>int</code> from <code>std::cin</code> first time, we have to simply return some kind of failure value ourselves- propagating the problem, because now all of <i>our</i> callers have to check every single call. Not to mention all of the constructors which could fail, or the types which don't have obvious failure values- for example, a string. What do you do if a string operation failed- return "HELP, I FAILED"? <br/>
+<br/>
+Hence, the need for exceptions arises. The key design criteria for exceptions that we are looking for are:</p><div class="well"><code>
+1. Does not require explicit error handling at every possible point of failure.<br/>
+2. Does not require explicit error propagation.<br/>
+3. Does not require a return value.<br/>
+</code></div><p>
+Some functions can still get away with returning failure values. The trick to knowing which is which is whether or not the failure value could be safely ignored by the user <i>and</i> is fairly obviously a failure value. You can't really have a string failure value- they're usually boolean, integral, floating-point, or specially designed types. And in addition, if they forget to check, everything is still fine. If so, then a failure value is probably OK. Else, an exception is required.<br/>
+<br/>
+First, the basic functionality of exceptions</p><div class="well"><code>
+#include &lt;iostream&gt;<br/>
+#include &lt;stdexcept&gt;<br/>
+void f() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;throw std::runtime_error(&quot;Fail!&quot;);<br/>
+}<br/>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;try {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::string s;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;f();<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; &quot;Never reaches here!&quot;;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;} catch(std::runtime_error& except) {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; except.what();<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br/>
+}<br/>
+</code></div><p>
+This program prints "Fail". When the exception is thrown, the run-time libraries look down the call stack looking for the closest <code>try</code>. When found, they check the <code>catch</code> to see if the types match. If so, the object (which can be value or reference/const reference) is constructed from the thing we threw, the catch block executes, and then control resumes from the end of the <code>catch</code> block. If not, the libraries keep looking for another <code>try</code>. If they do not find a matching <code>try</code>, then UB. Also, the local variables (including function arguments, temporaries, etc) of all of the functions in the middle are destructed.<br/>
+<br/>
+The first and most important note is that exceptions can occur from the vast majority of functions, as most depend on dynamic allocation, which can fail by throwing an exception. Some functions, however, guarantee not to throw- for example, all operations on integral, floating-point, and pointer types do not throw, and many user-defined functions (and Standard library functions) are also defined to never throw. Secondly, <code>s</code>'s destructor is still called as expected. There is no situation in the language which is where the destructor of local variables is <i>not</i> called- except if UB is invoked.</p>
+<p>Strictly, you can throw and catch whatever you want. But this isn't very helpful. In reality, you should only throw things derived from <code>std::exception</code>, found in <code>&lt;stdexcept&gt;</code>. The other Standard exception classes, like <code>runtime_error</code> follow this. </p>
+<p>Exercise: What happens if you throw an exception from a destructor? And, in addition, how does this behaviour differ if the destructor is already being executed due to an uncaught exception?</p>
+<ul class="pager">
+  <li class="previous">
+    <a href="Classes.html">&larr; Classes</a>
+  </li>
+  <li class="next">
+    <a href="Declarations.html">Declarations &rarr;</a>
+  </li>
+</ul>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

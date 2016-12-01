@@ -1,0 +1,75 @@
+
+
+<h1>Declarations</h1>
+<p>
+Declarations and definitions are a result of C++'s translation unit model. That is, each source code file in C++ is compiled to a binary object file individually, and then they are all linked together. That means that when the compiler runs on source code file X, it has no way to know what code will be available later at the linking stage.<br/>
+<br/>
+Earlier, I set an exercise to ask what happened if you defined a function after <code>main</code>, then attempted to call it. The answer, if you didn't check, is that the compiler cried. When the compiler compiled <code>main</code>, it had no idea about your <code>f</code> that you defined later in the source file. In addition, if you cared to define it in another source file, then the compiler would also cry.<br/>
+<br/>
+The solution to this problem is the declaration. You can declare many things- variables, functions, classes, and such. A declaration essentially says "I promise that this thing will be available to you later". A <i>function declaration</i> is the function prototype, followed by a semicolon rather than the function body.</p><div class="well"><code>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;f(); // Illegal: Compiler doesn't know what f is.<br/>
+}<br/>
+void f() {}<br/>
+</code></div><p>
+But this is legal:<br/>
+ </p><div class="well"><code>
+// declaration:<br/>
+void f(); <br />
+// I promise that f exists and that it is a function taking nothing returning void<br/>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;f(); // legal: Compiler knows f because you declared it<br/>
+}<br/>
+// definition:<br/>
+void f() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;// body<br/>
+}<br/>
+</code></div><p>
+Here, the <i>definition</i> of f may exist somewhere else- later in the source file or in another source file. For some declarations, the definition may even be in another language- usually C or assembly.<br/>
+<br/>
+There are also class declarations and forward declarations. A forward declaration looks like this:</p><div class="well"><code>
+class X;<br/>
+</code></div><p>
+It simply promises the compiler that a class with that name will exist here later. Note that you don't <i>actually</i> have to define this class in every source unit. There are some things that can be done with a class that has not been defined, only declared. For example, it is legal to store pointers of that type.</p><div class="well"><code>
+class X;<br/>
+X f(); // legal<br/>
+X* some_initializer(); // also legal<br/>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;X* x = some_initializer(); // legal<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;X& xref = *x; // Also legal<br/>
+}<br/>
+</code></div><p>
+However, as the compiler has no idea what methods are on the type, you cannot copy, nor move, nor hold by value such a type. Nor can you access any members, nor <code>delete</code> an object of that type (UB, not compiler error, unfortunately). In addition, you can declare functions which <i>do</i> take and return these objects by value. In this situation, X is called an <i>incomplete type</i>.<br/>
+<br/>
+Finally, you can define the class. This includes declarations of all members and data members- meaning that all data members must not be incomplete types.</p><div class="well"><code>
+class X { <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;void f();<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::string x;<br/>
+};<br/>
+</code></div><p>
+Now X is a complete type which may be instantiated, copied, moved, have member functions invoked, deleted, and such things. You may define class member functions with the syntax</p><div class="well"><code>
+void X::f() {<br/>
+}<br/>
+</code></div><p>
+This also works for functions in a namespace. However, all member functions act as if they are declared before the class for you by the compiler- when you write a class, the member functions can refer to each other, even if they are not declared. Namespace-scope functions don't support this.</p>
+<div class="well"><code>
+class x {<br />
+&nbsp;&nbsp;&nbsp;&nbsp;void f() { g(); }<br />
+&nbsp;&nbsp;&nbsp;&nbsp;void g() {} // Legal<br />
+};<br />
+void f() { g(); }<br />
+void g() {} // Compiler cries- what's g?
+</code></div>
+<br/>
+Exercise: How many times can you define a class, declare a class, and declare a function?<br/>
+</p>
+<ul class="pager">
+  <li class="previous">
+    <a href="Exceptions.html">&larr; Exceptions</a>
+  </li>
+  <li class="next">
+    <a href="ODR.html">One Definition Rule &rarr;</a>
+  </li>
+</ul>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

@@ -1,0 +1,17 @@
+
+
+
+
+<p>
+When computers were first invented in the UK and US, it became necessary to store and manipulate text. This means having a binary encoding. The most obvious thing to do (when you only speak English and only sell computers to English-speaking companies) is to assign the numbers 0-127 to a bunch of English characters, plus a couple necessities like new line, some punctuation, and such, and then walk away. This is known as the ASCII coding and is the simple meaning of <code>char</code>- one ASCII character. If you wanted to view the next character, you could simply increment an index and it was easy.<br/>
+<br/>
+Unfortunately, when people noticed that actually, those guys in Israel, Japan, and Greece <i>also</i> wanted to purchase computers, this became a problem. It was compounded by the fact that a byte is usually 8 bits, but 0-127 is only 7 bits. That extra bit was quickly used to store various different kinds of text depending on where you lived- if you were in Greece, it would be Greek characters, and if you were in Israel, it would be Hebrew, and such. This is called "codepages", where each codepage is one set of extended characters in 128-255. This was OK, and existing programs worked with it... somewhat. But there are two imminent problems. Namely, first, that text is completely non-interchangable between computers, because they have different encodings depending on where you live, and your Greek prose will become unreadable Hewbrew gibberish, and secondly, if you live in a place like Korea, China, or Japan, then your native language wouldn't even <i>fit</i> in 128-255. With the advent of the Internet, exchanging text between machines became a fairly common thing to do.<br/>
+<br/>
+To solve these problems, we have Unicode. First begun in 1987, but didn't become widely used until about 1995 or later. Unicode is one single character set that can deal with text in any language on any computer- solving both the problems of codepages. The main problem that we have is that Unicode is, well, problematic. For example, when you upper case text in English, this is simple. But in Arabic, this is actually quite a complex process- and when you uppercase &szlig; in German, you get SS- two characters instead of one. When you have to support every language used globally, the complexity of the resultant system is high. Not to mention the fact that Unicode posseses different binary encodings.<br/>
+<br/>
+And just to top all this glory off, the C++ Standard's string handling is from about 1992, where Unicode did not really exist. It is extremely unhelpful when dealing with Unicode. On top of that, the interfaces written which were intended to support different encodings can't be implemented to support Unicode, and if that weren't bad enough, a whole bunch of encoding is implementation-defined.<br/>
+<br/>
+Whereas previously, many things we met had convenient solutions provided by the Standard library or language, Unicode is a plain mess in Standard C++, through and through. There are no quick fixes here. And you have to know it to write any programs that handle text (kinda common). But we'll start gentle with the encodings. By the way, this ensures that you have to know what encoding any given piece of text is in.<br/>
+</p>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

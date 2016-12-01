@@ -1,0 +1,57 @@
+
+
+
+
+<h1><code>std::sort</code></h1>
+<p>
+A sorting operation is relatively simple, conceptually- in a sorted list, for each element a, if a is less than b, it precedes b in whatever medium of storage we are using. Sorting is the means of taking an arbitrary unsorted container and sorting it. Typically, sorts are described on lists- but here, "list" means "any random access container", and in addition "less than" is just the default operation- in reality, we can replace it to be whatever ordering criterion we want using a function object (next tutorial). Sorting can be done by using <code>std::sort</code>, which takes two random access iterators- usually <code>cont.begin(), cont.end()</code>. <code>std::sort</code> guarantees <code>O(n * log(n))</code> complexity. It is possible for some types to be sorted faster than this, but having both the need and the correct type and other preconditions is very rare. We won't be looking at these more specialized sorts. In addition, there are <i>many</i>  sorting algorithms. We will only look at a couple.<br/>
+<br/>
+The most obvious sort algorithm is quite intuitive. As we specified that, for a sorted container, <code>a &lt; b</code> if <code>a</code> occurs before <code>b</code>, perhaps the most obvious thing to do is to simply iterate through the container, and wherever <code>b &lt; a</code>, then swap <code>a</code> and <code>b</code> to resolve this problem. This will keep going until no swaps were performed. This simple algorithm is called bubblesort- one of the slower sorts.</p><div class="well"><code>
+&nbsp;template&lt;typename random_iterator&gt; void bubble_sort(random_iterator begin, random_iterator end) {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;while(true) {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;bool swaps = false;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for(auto it = begin; it != (end - 1); ++it) {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (*(it + 1) &lt; *it)) {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::swap(*it, *(it + 1));<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;swaps = true;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (!swaps) break;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br/>
+&nbsp;}<br/>
+</code></div><p>
+It's called bubblesort because each element bubbles through the container into the right place. But since element (of which there are N) might have to move the whole list (up to N), then the complexity is O(n^2). There's also quicksort. Quicksort is pretty fast on most data sets but can have some nasty worst case performance. Quicksort takes a "pivot" element- usually the first in the list, but you can also get median-of-three and some other schemes- and partitions the list so that all elements greater than the pivot are in the back, and all lesser are in the front. Once this division has been performed, sorting the list now becomes a question of simply sorting the two sublists- usually by applying quicksort recursively until the sublists are only 1 or 2 elements long. This gives quicksort an O(n^2) complexity in the worst case, because if the pivot is very badly chosen, you will actually only solve only one or two elements each recursion, instead of half the list. However, if the pivot isn't terrible, quicksort will run very quickly- <code>n*log(n)</code>.</p><div class="well"><code>
+template&lt;typename random_iterator&gt; void quick_sort(random_iterator begin, random_iterator end) {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;if (end - begin &lt; 2) return; // Lists of 1 or 0 elements are already sorted.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;auto final = (end - 1); // last valid position<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;if (end - begin == 2) { // Do a very simple sort for a 2-element list.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (!(*begin &lt; *final))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::swap(*begin, *final);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::swap(*begin, *final); // Put the pivot to the end<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;auto store = begin; // For each element, if it's less than pivot, put it to the &quot;front&quot;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;for(auto it = begin; it != end; ++it) {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (*it &lt; *final) {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::swap(*store, *it);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;++store;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;} // Now store indicates the first element of the &quot;bigger&quot; partition<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::swap(*store, *final); // Put the pivot in the middle.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;quick_sort(begin, store);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;++store; // Skip over the pivot<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;quick_sort(store, end);<br/>
+}<br/>
+</code></div><p>
+There are many other sorting algorithms- you could give an entire book to the various algorithms that are out there, their advantages and disadvantages, and how they perform. The Standard <code>&lt;algorithm&gt;</code> header provides many simple algorithms for our use, like <code>std::accumulate</code>, <code>std::transform</code> and others. But we'll look at something much more interesting- function objects which allow us to arbitrarily customize our algorithms.<br/>
+</p>
+<ul class="pager">
+  <li class="previous">
+    <a href="Complexity.html">&larr; Complexity</a>
+  </li>
+  <li class="next">
+    <a href="Functors.html">Function Objects &rarr;</a>
+  </li>
+</ul>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

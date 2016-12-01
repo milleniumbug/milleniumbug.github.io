@@ -1,0 +1,35 @@
+
+
+
+
+<p>
+The C++ Standard incorporates the majority of the C Standard. This includes the C Standard Library, unfortunately, and all the functions within- including string handling and I/O. C-style I/O tends to be much faster than <code>&lt;iostream&gt;</code>, but is hideously unsafe, completely non-extensible, and won't work well with our C++ types.<br/>
+<br/>
+First, <code>printf</code> and friends, from <code>&lt;cstdio&gt;</code>. <code>printf</code> takes a format string and variable arguments. The basic gimmic behind <code>printf</code> is the "format string". This is basically a string which lists the arguments you passed to <code>printf</code> and in what order to substitute them. Each argument is substituted in the order passed. However, as you know from our study of variable arguments, it is impossible to know how many arguments were passed or what type they are, so the format string has to be correct or UB. For example,</p><div class="well"><code>
+const char* s = &quot;Hello, World!&quot;;<br/>
+printf(&quot;%s&quot;, s);<br/>
+</code></div><p>
+The <code>%s</code> specifier indicates to <code>printf</code> that the first argument is a string and it should go where <code>%s</code> went. <code>%d</code> is the specifier for an integer.</p><div class="well"><code>
+const char* s = &quot;Hello, World!&quot;;<br/>
+printf(&quot;%s, %s&quot;, s, s); // OK<br/>
+printf(&quot;%d&quot;, s); // UB<br/>
+printf(&quot;%s, %s&quot;, s); // UB<br/>
+</code></div><p>
+As you can see, this is effectively violating DRY, because the type of the variable we declared earlier is being re-specified in the format string. In addition, the order in the format string is a duplicate of the order of the arguments. This duplication is a major source of errors when dealing with <code>printf</code>. In addition, even though the first argument is a string, passing in something that is not a literal is extremely unsafe. Consider something like this:</p><div class="well"><code>
+std::string s = get_user_input();<br/>
+printf(s.c_str());<br/>
+</code></div><p>
+Oops- what if <code>s</code> contained a format specifier, whether intentionally or not?<br/>
+<br/>
+For input, we have a similar function, <code>scanf</code>. This inputs rather than outputs, and takes pointers. Note that the string specifier may take a size "argument".</p><div class="well"><code>
+int var;<br/>
+scanf(&quot;%d&quot;, &var);<br/>
+char x[21];<br/>
+scanf(&quot;%20s&quot;, x);<br/>
+</code></div><p>
+Of course, if there are more than 20 characters of input, this can still fail. In addition, whereas we overloaded operators to permit our own types to be used with <code>&lt;iostream&gt;</code>, there is no way to add your own format specifier to <code>printf</code> or <code>scanf</code>. There are also <code>fscanf</code> and <code>fprintf</code> variants that can print to a C <code>FILE*</code>. This is an opaque pointer to some runtime-provided struct that represents a file. You can use <code>fopen</code> to open it and <code>fclose</code> to close it.<br/>
+<br/>
+Generally, because of the large security problem that C-style I/O presents, most maintainers convert them to <code>&lt;iostream&gt;</code>-based I/O as soon as possible. There is a reasonable argument that C-style I/O is much faster than the C++ equivalent, but there's no reasonable argument for not immediately wrapping it.<br/>
+</p>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

@@ -1,0 +1,47 @@
+
+
+
+
+<h1><code>std::shared_ptr</code></h1>
+<p>
+<code>std::shared_ptr</code> is a class template, also provided by the Standard library and also located in <code>&lt;memory&gt;</code>. It also manages resources for us in a slightly different fashion. Each <code>std::shared_ptr</code> owns one reference to the resource. When all references are destroyed, the object is destroyed. This is known as "reference counting". It is good for objects which need to be owned by potentially many owners at the same time. Multiple <code>std::shared_ptr</code> can point to the same resource and <code>std::shared_ptr</code> is copyable, unlike <code>std::unique_ptr</code>. Like <code>std::unique_ptr</code>, <code>std::shared_ptr</code> is constructed with a pointer to the resource you wish to own, and through a slightly different mechanism, can also have a custom resource destructor. Reference counting has some overhead (not a lot, but some) whereas <code>std::unique_ptr</code> has no overhead whatsoever. In addition, <code>std::shared_ptr</code> has a couple of usage hiccups that <code>std::unique_ptr</code> does not have.<br/>
+<br/>
+First, ownership in C++ is a directed acyclic graph. This means that from any object A, there is no way to go from A back to A again. It is more than possible to break this rule.</p><div class="well"><code>
+class B; // forward declaration- we haven't yet met declarations<br/>
+class A {<br/>
+public:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::shared_ptr&lt;B&gt; b;<br/>
+};<br/>
+class B {<br/>
+public:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::shared_ptr&lt;A&gt; a;<br/>
+};<br/>
+</code></div><p>
+Imagine what would occur if <code>b-&gt;a-&gt;b == b</code>. When the last <i>external</i> reference to <code>b</code> is gone, <code>b</code> still can't be cleaned up, because it's referenced by <code>a</code>. But <code>a</code> can't be cleaned up because it's referenced by <code>b</code>- even though neither of them can actually be referenced from the outside world and therefore never cleaned up. This is known as a "reference cycle". <code>std::unique_ptr</code> can suffer from this too, but you'd have to have something more contrived to end up in this situation, since you'd have to explicitly give <code>b</code> ownership of itself, effectively, and it's more obvious that in fact, nobody owns either of these objects. Reference cycles are very rare, and they're quite visible on the type system- when you look at these two types, each can own the other. This is a big warning sign of reference cycles. It is quite unusual but worth bearing in mind.<br/>
+<br/>
+Secondly, the exact mechanism behind <code>std::shared_ptr</code>. For <code>std::unique_ptr</code>, you can do</p><div class="well"><code>
+void f() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;auto p = new int();<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::unique_ptr&lt;int&gt; x(p);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::unique_ptr&lt;int&gt; x2(p);<br/>
+}<br/>
+</code></div><p>
+However, this clearly generates two <code>std::unique_ptr</code> that own the same resource- and they are no longer unique. It's fairly obviously a violation of the use of <code>std::unique_ptr</code>. Most people simply construct <code>std::unique_ptr&lt;int&gt; x(new int())</code> or use <code>make_unique</code>. But for <code>std::shared_ptr</code>, it's a little less obvious what happens.</p><div class="well"><code>
+void f() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;auto p = new int();<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::shared_ptr&lt;int&gt; x(p);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::shared_ptr&lt;int&gt; x2(p);<br/>
+}<br/>
+</code></div><p>
+Good, or bad? Well, it would be possible to both specify and implement <code>std::shared_ptr</code> so that this would be good- but that would be a <i>massive</i> headache and it's much simpler to just go with bad. The key point here is that the only way to share ownership with a <code>std::shared_ptr</code> is to copy it. Constructing again from the original resource does not share it- it creates two different owners, with two different reference counts. This is just as bad as any other system with two owners- a giant pile of owch waiting to happen.</p>
+<p>Thankfully, the Standard <i>does</i> provide <code>std::make_shared</code> for us. It's usage is the same as <code>make_unique</code>, but it returns a <code>std::shared_ptr</code> instead of a <code>std::unique_ptr</code>. Unlike <code>std::unique_ptr</code>, creating through <code>std::make_shared</code> is slightly more efficient than directly.</p>
+<ul class="pager">
+  <li class="previous">
+    <a href="UniquePtr.html">&larr; <code>std::unique_ptr</code></a>
+  </li>
+  <li class="next">
+    <a href="Complexity.html"><code>Complexity</code> &rarr;</a>
+  </li>
+</ul>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

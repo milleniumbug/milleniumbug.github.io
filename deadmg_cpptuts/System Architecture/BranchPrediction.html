@@ -1,0 +1,50 @@
+﻿
+
+
+
+
+<h1>Branch Prediction</h1>
+<p>When we create an if statement, the processor has an instruction available for this purpose, called a "branch". In this case, if the value passes a test, the CPU jumps execution to some other instruction. This has an 
+    unfortunate side effect. When the processor executes instructions, it "pipelines" them. Effectively, whilst executing one instruction, it is already decoding the next. This is a simplified view- the pipeline is 
+    typically several instructions long. But when a branch is encountered, the CPU doesn't know which instructions are about to be executed- so how can it begin decoding the next instruction? So it guesses- it attempts to 
+    predict the branch and runs the pipeline on the next instructions in the guessed code path. If success, then the branch is basically free- the pipeline suffers no interruption. If it fails, the entire pipeline has to 
+    be flushed and restarted from scratch, not a cheap operation. We will see the price of this in our next code sample.
+</p>
+<div class="well"><code>
+int main() {
+    std::array&lt;char, 50000&gt; arr;
+    for(int i = 0; i < arr.size(); i++)
+        arr[i] = rand() % 255;
+    int sum = 0;
+
+    for(int i = 0; i < arr.size(); i++) {
+        if (arr[i] < 128) {
+            sum += arr[i];
+        }
+    }
+
+    sum = 0;
+    std::sort(arr.begin(), arr.end());
+    for(int i = 0; i < arr.size(); i++) {
+        if (arr[i] < 128) {
+            sum += arr[i];
+        }
+    }
+}
+</code></div>
+<p>The first loop, which should be identical to the second, computes its result in 0.0002 seconds. The second is 0.00005 seconds- a four times improvement. This is because in the second loop, the CPU's branch predictor 
+    can accurately predict which way the branch is going, because for almost all tests, they go the same way as the test before (except for the first value which is above 127). But in the first loop, values which pass and 
+    fail are randomly interchanged, so the CPU can't get a grip on which way the branch is going to go, and pipeline flushes abound.
+</p>
+<p>Unfortunately, the time for the second if you include the sort is ten times the first. This makes sorting an effective pre-computation step, if we performed many such loops, but it's no fun if we're only operating once. 
+    However, there is another way to take advantage of our knowledge of branch prediction to optimize this example. We replace the first loop with
+</p>
+<div class="well"><code>
+for(int i = 0; i < arr.size(); i++)
+    sum += (arr[i] < 128) * arr[i];
+</code></div>
+<p>As this code has no branches, we won't invoke the predictor, and the order of values should be irrelevant. The unsorted code is still slower, but we have doubled it's performance with this. It is possible to write even 
+    better branchless code that can compete directly, but that code is nasty, and platform-specific, so I won't show it here.</p>
+
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

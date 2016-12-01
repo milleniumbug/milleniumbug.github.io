@@ -1,0 +1,28 @@
+
+
+
+
+<p>
+Previously, we wrote a partial specialization that would give a different value depending on whether or not it was given an instantiation of <code>std::vector</code>. This is a simple example of a "type trait". Type traits are given one or more types, and return to us useful information about that type(s). The Standard provides quite a few type traits- some of which can only be implemented with special compiler magic.<br/>
+<br/>
+There are two basic methods for implementing type traits. The first is a partial specialization, like we saw above. This can implement some basic type traits- for example,</p><div class="well"><code>
+template&lt;typename T, typename U&gt; struct is_same {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;static const bool value = false;<br/>
+};<br/>
+template&lt;typename T&gt; struct is_same&lt;T, T&gt; {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;static const bool value = false;<br/>
+};<br/>
+</code></div><p>
+The second method revolves around a pal we haven't met yet- variadic arguments. There is no actual use for a function that takes variadic arguments, except that we can use overload resolution. Variadic arguments are the absolute bottom of the overload resolution pile. By giving this function one return type, and the desired function another, then checking the return type, we can determine which function overload resolution picked. We also meet <code>std::declval</code>. This utility function returns a theoretical rvalue of the type passed. It can never actually be called, but we can use it to gain information about the type.</p><div class="well"><code>
+template&lt;typename base, typename derived&gt; struct is_base {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;typedef std::array&lt;char, 2&gt; no;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;typedef char yes;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;static no f(...);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;static yes f(base* p);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;static const auto value = sizeof(f(std::declval&lt;derived*&gt;())) == sizeof(yes);<br/>
+};<br/>
+</code></div><p>
+Here, if the pointer to <code>derived*</code> implicitly converted to a pointer to <code>base*</code>, as will happen in inheritance, then the overload of <code>f</code> that returns the <code>yes</code> type was selected- which we detected by checking the size of the return value. If it didn't, then the variadic arguments overload was picked, which returns the <code>no</code> type- which fails the comparison and therefore <code>derived</code> is, in fact, not derived from the base. More complex type traits can be written, but in order to understand their construction, we will need SFINAE.<br/>
+</p>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

@@ -1,0 +1,51 @@
+
+
+<h1>Variables</h1>
+<p>
+So far, our tiny programs could only output text. But this is not a very useful thing to be able to do on it's own. Real programs must perform three critical functions: Take in data. Process data. Output data. Having already covered the last task, we will now deal with the middle task. A variable is a fairly simple concept. It is an area of memory that we set aside to perform a specific task. What task is this, you ask? Well, that task is determined by it's type. All variables in C++ are statically-typed. This means that their type is known by the compiler. They are also given names which refer to them. Here, we introduce the string type, useful for the task of storing and manipulating strings (a string is just a bunch of characters). When we described text earlier, it is (for our current purposes) of the string type. To access the string type, we must add an extra <code>#include</code> to the top of our program. Here, I will demonstrate some simple but important properties. </p>
+<div class="well"><code>#include &lt;iostream&gt;<br />
+#include &lt;string&gt;<br />
+int main() {<br />
+</code></div><p>
+It's basically the same as before, but we also included <code>&lt;string&gt;</code>. </p>
+<div class="well"><code>&nbsp;&nbsp;&nbsp;&nbsp;std::string hello(&quot;Hello,&quot;);<br />
+&nbsp;&nbsp;&nbsp;&nbsp;std::string world(&quot; World!&quot;);
+</code></div><p>
+These lines "construct" the variables. Construction is an important concept that will be given much time and thought later on. For now, it is important to understand that before construction, a variable does not exist. It is impossible to refer to hello before the line which constructs it. If you try, your compiler will cry. You can also construct unnamed variables by simply ommitting the name, and named ones can also be constructed by using the <code>=</code> character.</p>
+<div class="well"><code>&nbsp;&nbsp;&nbsp;&nbsp;std::string hello = &quot;Hello,&quot;;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::string hello(&quot;Hello,&quot;);<br />
+&nbsp;&nbsp;&nbsp;&nbsp;// These two lines aren't exactly equivalent, but the difference is one we will only need much later.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; std::string(&quot;Hello, World!&quot;);<br />
+&nbsp;&nbsp;&nbsp;&nbsp;// Outputs one unnamed string<br />
+}<br/>
+</code></div><p>Each variable is a distinct area of storage. Changes to one will not affect another. They are independent. This is known as <i>value semantics</i>. Each value chooses what behaviours it does and does not support, but <code>std::string</code> supports most of them. You can copy from one variable to another with <code>=</code>, and you can also construct one directly from another to copy.</p>
+<div class="well"><code>
+&nbsp;&nbsp;&nbsp;&nbsp;hello = &quot;Bye&quot;;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;// Overwrites the previous contents of hello with &quot;Bye&quot;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::string copy = hello;
+</code></div>
+<p>For strings, attempting to add them performs concatenation- that is, a new string is created which has the first string's text, and then the second's. This is a pretty helpful and common operation- and it supports many others that we will encounter later. Thus, I usually term <code>std::string</code> as a "helpful" string.</p>
+<h1>Unhelpful Strings</h1>
+<p>If std::string is a "helpful string", then is there an "unhelpful" string? Why yes, there is. Earlier, I said that the type of text is string. In fact, it's an unhelpful string. Unhelpful strings are termed so because they're, well, unhelpful. There's really nothing you can do with them except create a helpful string from them, which can happen implicitly in many situations, but unfortunately not all of them. This leads to the following pain:<br/>
+</p><div class="well"><code>
+std::cout &lt;&lt; &quot;hello&quot; + &quot;world&quot;;<br/>
+</code></div><p>
+Compiler cries. Unhelpful strings don't allow this.</p><div class="well"><code>
+std::cout &lt;&lt; std::string(&quot;hello&quot;) + &quot;world&quot;; <br/>
+</code></div><p>
+Fine- constructs an unnamed helpful string from "hello" then "world" is converted to a helpful string and then concatenated.<br/>
+<br/>
+Fortunately, in almost all situations, the conversion to a helpful string is implicit, but in some situations, you will have to do it explicitly. Most types, fortunately, do not have this problem and come in always-helpful variants.<br/>
+<br/>
+Exercise: What other useful functions do helpful strings provide?<br/>
+</p>
+<ul class="pager">
+  <li class="previous">
+    <a href="Escapes.html">&larr; Escapes</a>
+  </li>
+  <li class="next">
+    <a href="Integers.html">Integers &rarr;</a>
+  </li>
+</ul>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

@@ -1,0 +1,61 @@
+
+
+<h1>Lvalue References</h1>
+<p>
+First, we will study the concept of a reference. References come in two kinds, lvalue and rvalue. Lvalue references, put simply, are objects that, when accessed, actually access other objects. This is known as "aliasing"- that is, when a reference is used, it is as if it is simply another name for the object it references. A reference to a type T is introduced by an ampersand after the name of T. We "bind" a reference to an object by assigning that object to the reference when it is constructed.</p><div class="well"><code>
+#include &lt;iostream&gt;<br/>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;int i = 0;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;int&amp; x = i;<br/>
+</code></div><p>
+This binds the reference x to the object i. Now we can access i through x- and x pretends, in every possible way, as if it is actually i.</p><div class="well"><code>
+&nbsp;&nbsp;&nbsp;&nbsp;x = 5; // actually sets i to 5.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; i; // prints 5<br/>
+}<br/>
+</code></div><p>
+They can also be passed as function arguments, and follow the same semantics.</p><div class="well"><code>
+#include &lt;iostream&gt;<br/>
+void set_int(int&amp; x) { x = 5; }<br/>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;int i;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;set_int(i);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; i; // also prints 5<br/>
+}<br/>
+</code></div><p>
+References form the basis of how many useful things are implemented. An observant reader may note that the pattern above, where we first defined a variable and then passed it to a function expecting a reference, is exactly the same as how we used <code>std::cin</code>. This is no accident. The functionality <code>std::cin</code> provides is based on references.<br/>
+<br/>
+An important question to ask is- what happens if we pass an integer without using a variable first? Your compiler will cry.</p><div class="well"><code>
+set_int(0); // owch<br/>
+</code></div>
+<p>This is due to the fundamental nature of an lvalue. An lvalue is a thing that will be around for a while. But 0 is not a thing that will be around for a while. In fact, as soon as <code>set_int(0)</code> returns, the 0 will cease to exist. Thus, it makes no sense to allow 0 to bind to an lvalue reference. After all, when you set 0 to 5, what's the point? Nobody can look at that 0 later and say "Hang on, why is my 0 actually 5?". Interestingly, in an old language called FORTRAN, you <i>could</i> alias integer literals and change their values- and those changes were global throughout the program. Imagine the fun that caused.</p>
+<h1>Rvalue References</h1>
+<p>
+The parallel to the lvalue reference is the rvalue reference. Rvalue references bind to rvalues (shock) and rvalues are defined conversely to lvalues - an rvalue is a thing which will not exist for much longer. An rvalue reference is defined with a double ampersand after the type name.</p><div class="well"><code>
+#include &lt;iostream&gt;<br/>
+void set_int(int&amp;&amp; x) { x = 5; }<br/>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;set_int(0); // Thoroughly pointless, but legal<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;int i;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;set_int(i); // compiler cry<br/>
+}<br/>
+</code></div>
+<p>Fortunately in C++ each integer literal is separate, so you cannot change the value of 0. When you create a temporary variable with the <code>T()</code> syntax, this is an rvalue. Rvalue references may not currently seem to have much purpose, but they will become a key player later on. What's important right now is to know the difference between an lvalue and an rvalue, and to be able to use lvalue references safely.</p>
+<p>When you create a variable in a function, it is destroyed when the function exits. It is UB to access a destroyed variable. Thus, UB abounds if you return a reference to a local variable. Strictly, it's UB to even <i>have</i> such a reference. If a function returns a type T, then the return value is an rvalue, unless T is U&amp; for some U, when it is an lvalue. This is because we know that the U& refers to some expression of type U that is an lvalue, and it pretends to be that expression in every way- including <i>value category</i> (whether it is lvalue or rvalue). <i>value category</i> is a property of <i>expressions</i>, not objects. A named rvalue reference is an lvalue. User-defined functions should virtually never return an rvalue reference.</p>
+<div class="well"><code>
+int main() {<br />
+&nbsp;&nbsp;&nbsp;&nbsp;int&amp;&amp; x = 0;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;int&amp; y = x;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;// Confusingly legitimate.<br />
+}
+</code></div>
+<p>Exercise: Are unhelpful string literals lvalues, or rvalues, and how can you find out?</p>
+<ul class="pager">
+  <li class="previous">
+    <a href="Templates.html">&larr; Templates</a>
+  </li>
+  <li class="next">
+    <a href="Overloading.html">Overloading &rarr;</a>
+  </li>
+</ul>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>

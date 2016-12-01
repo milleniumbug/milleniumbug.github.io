@@ -1,0 +1,52 @@
+
+
+
+
+<h1>SFINAE</h1>
+<p>
+SFINAE stands for "Substitution Failure Is Not An Error". It is an addendum to the rules of overloading. Simply put, it refers to arbitrary compile-time checks that you can make on arguments to templated functions. If they fail, the function is removed from the set of possible overloads, and then overload resolution continues. This effectively enables us to customize the overload resolution algorithm arbitrarily.<br/>
+<br/>
+Earlier, we saw that <code>std::function</code> has a nasty problem with overloading. We will observe how to solve this problem using SFINAE (for only one-argument functions). First, we will require a type trait that will tell us if we have met the requirements. Briefly, we will also introduce a <i>trailing return type</i>. This is where the normal return type is stated to be <code>auto</code> and the return type is placed after the argument declarations using <code>-&gt;</code>, much like a lambda. This is used so that you can refer to the arguments in the return type expression, which is usually computed from the arguments using <code>decltype</code>.</p><div class="well"><code>
+template&lt;typename sig, typename functor&gt; struct is_callable;<br/>
+template&lt;typename Ret, typename Arg, typename functor&gt; <br/>
+struct is_callable&lt;Ret(Arg), functor&gt; { // partial spec<br/>
+private:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;struct no {};<br/>
+public:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;template&lt;typename U&gt; static auto f(std::nullptr_t) <br />
+&nbsp;&nbsp;&nbsp;&nbsp; -&gt; decltype(std::declval&lt;U&gt;()(std::declval&lt;Arg&gt;()));<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;template&lt;typename U&gt; static no f(...);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;static const int value = <br />
+&nbsp;&nbsp;&nbsp;&nbsp;!std::is_same&lt;no, decltype(f&lt;functor&gt;(nullptr))&gt;::value &&<br />
+&nbsp;&nbsp;&nbsp;&nbsp;std::is_convertible&lt;decltype(f&lt;functor&gt;(nullptr)), Ret&gt;::value;<br/>
+};<br/>
+</code></div>
+<p>What is the return type of <code>f</code>? It is the type returned by an object of type U, being called with an object of type Arg. If this is legal, then great, and that overload of f is chosen. If not, then substitution failure. This failure causes that overload of f to be removed from the overload set, and the other is chosen. By simply checking the return type of overload resolution, we can determine whether or not this expression was legal. Finally, we also check that Ret can be implicitly constructed from the return value- functionality provided for us by <code>std::is_convertible</code>.</p>
+<p>Now we add it to our <code>my_func</code> class.</p><div class="well"><code>
+template&lt;typename sig&gt; class my_func {<br/>
+public:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;template&lt;typename F, <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;typename = typename std::enable_if&lt;is_callable&lt;sig, F&gt;::value&gt;::type<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&gt; my_func(F f) {}<br/>
+};<br/>
+</code></div><p>
+<code>std::enable_if</code> contains template machinery that causes SFINAE. We simply pass in a boolean value as to whether or not to enable this overload- kindly created for us by <code>is_callable</code>. The dummy template parameter is unnamed. If F is not callable with sig, then <code>is_callable&lt;sig, F&gt;::value</code> is false, <code>enable_if</code> causes a substitution failure, and it's removed. Else, it continues. Now, we see how this solves our previous problem.</p>
+<div class="well"><code>
+void f(my_func&lt;int(int)&gt;);<br/>
+void f(my_func&lt;std::string(std::string)&gt;);<br/>
+int main() {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;f([](std::string arg) { return arg + &quot;Shlub&quot;; });<br/>
+}<br/>
+</code></div>
+<p>Note that the Standard <code>is_callable</code> trait has some truly strange semantics and really isn't good for much, so you might find a need for this trait yourself.</p>
+<p>You may observe that limiting it to one-argument functions is bad- and writing N overloads for N-arg functions isn't fun either. Thus, we introduce the <i>variadic template</i>.</p>
+<ul class="pager">
+  <li class="previous">
+      <a href="PerfectForwarding.html">&larr; Perfect Forwarding</a>
+  </li>
+  <li class="next">
+      <a href="Variadics.html">Variadic Templates &rarr;</a>
+  </li>
+</ul>
+
+<h3>Tutorials written by DeadMG "Puppy" <a href="http://codepuppy.co.uk/">http://codepuppy.co.uk/</a>, <a href="https://bitbucket.org/DeadMG/older-stuff">extracted from here</a></h3>
