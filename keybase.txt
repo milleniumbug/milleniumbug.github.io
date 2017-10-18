@@ -1,0 +1,55 @@
+==================================================================
+https://keybase.io/milleniumbug
+--------------------------------------------------------------------
+
+I hereby claim:
+
+  * I am an admin of https://milleniumbug.github.io
+  * I am milleniumbug (https://keybase.io/milleniumbug) on keybase.
+  * I have a public key ASDgk5Jy8FLX-21hD3HVvQAb_qT7l_2WVExsFzagyJqLQwo
+
+To do so, I am signing this object:
+
+{
+  "body": {
+    "key": {
+      "eldest_kid": "0101d8fb1e120c74f4bee441f3ba347af2b37bd47ddd1fcf8c62503572ef50e584940a",
+      "host": "keybase.io",
+      "kid": "0120e0939272f052d7fb6d610f71d5bd001bfea4fb97fd96544c6c1736a0c89a8b430a",
+      "uid": "827018d8495c0f321d98c03f145bd019",
+      "username": "milleniumbug"
+    },
+    "merkle_root": {
+      "ctime": 1508369157,
+      "hash": "ca776309c14658d0fe7d76da408552c69ee29791de48c4ced7871a87a39586229e2fe73065b5ccac3ec59d7630b345dedf259426f08db2e5ffb4412ef5043e9e",
+      "hash_meta": "2196d8ddf99962a4c8dccca8325a9f86ebbf1b6fe4087d0e1e533f0e7942db0d",
+      "seqno": 1599969
+    },
+    "service": {
+      "hostname": "milleniumbug.github.io",
+      "protocol": "https:"
+    },
+    "type": "web_service_binding",
+    "version": 1
+  },
+  "client": {
+    "name": "keybase.io go client",
+    "version": "1.0.33"
+  },
+  "ctime": 1508369163,
+  "expire_in": 504576000,
+  "prev": "80831f9eb7957f6b83970b49a280cdd93dec1704ade71d3ee51c76d5d8d71420",
+  "seqno": 35,
+  "tag": "signature"
+}
+
+which yields the signature:
+
+hKRib2R5hqhkZXRhY2hlZMOpaGFzaF90eXBlCqNrZXnEIwEg4JOScvBS1/ttYQ9x1b0AG/6k+5f9llRMbBc2oMiai0MKp3BheWxvYWTFA1N7ImJvZHkiOnsia2V5Ijp7ImVsZGVzdF9raWQiOiIwMTAxZDhmYjFlMTIwYzc0ZjRiZWU0NDFmM2JhMzQ3YWYyYjM3YmQ0N2RkZDFmY2Y4YzYyNTAzNTcyZWY1MGU1ODQ5NDBhIiwiaG9zdCI6ImtleWJhc2UuaW8iLCJraWQiOiIwMTIwZTA5MzkyNzJmMDUyZDdmYjZkNjEwZjcxZDViZDAwMWJmZWE0ZmI5N2ZkOTY1NDRjNmMxNzM2YTBjODlhOGI0MzBhIiwidWlkIjoiODI3MDE4ZDg0OTVjMGYzMjFkOThjMDNmMTQ1YmQwMTkiLCJ1c2VybmFtZSI6Im1pbGxlbml1bWJ1ZyJ9LCJtZXJrbGVfcm9vdCI6eyJjdGltZSI6MTUwODM2OTE1NywiaGFzaCI6ImNhNzc2MzA5YzE0NjU4ZDBmZTdkNzZkYTQwODU1MmM2OWVlMjk3OTFkZTQ4YzRjZWQ3ODcxYTg3YTM5NTg2MjI5ZTJmZTczMDY1YjVjY2FjM2VjNTlkNzYzMGIzNDVkZWRmMjU5NDI2ZjA4ZGIyZTVmZmI0NDEyZWY1MDQzZTllIiwiaGFzaF9tZXRhIjoiMjE5NmQ4ZGRmOTk5NjJhNGM4ZGNjY2E4MzI1YTlmODZlYmJmMWI2ZmU0MDg3ZDBlMWU1MzNmMGU3OTQyZGIwZCIsInNlcW5vIjoxNTk5OTY5fSwic2VydmljZSI6eyJob3N0bmFtZSI6Im1pbGxlbml1bWJ1Zy5naXRodWIuaW8iLCJwcm90b2NvbCI6Imh0dHBzOiJ9LCJ0eXBlIjoid2ViX3NlcnZpY2VfYmluZGluZyIsInZlcnNpb24iOjF9LCJjbGllbnQiOnsibmFtZSI6ImtleWJhc2UuaW8gZ28gY2xpZW50IiwidmVyc2lvbiI6IjEuMC4zMyJ9LCJjdGltZSI6MTUwODM2OTE2MywiZXhwaXJlX2luIjo1MDQ1NzYwMDAsInByZXYiOiI4MDgzMWY5ZWI3OTU3ZjZiODM5NzBiNDlhMjgwY2RkOTNkZWMxNzA0YWRlNzFkM2VlNTFjNzZkNWQ4ZDcxNDIwIiwic2Vxbm8iOjM1LCJ0YWciOiJzaWduYXR1cmUifaNzaWfEQNJkIIJqQk2u7zAsNIVdWjVF9/Pih/88mQ+WWzxrdTZ4/WlKcSAQtRxJ/6N6DqPSoyqIycWYxzDh9Q2YyOU5gQuoc2lnX3R5cGUgpGhhc2iCpHR5cGUIpXZhbHVlxCD+GrBlximeKefHd9eM3ttFp2OlxtioVtSBMyceoubwRqN0YWfNAgKndmVyc2lvbgE=
+
+And finally, I am proving ownership of this host by posting or
+appending to this document.
+
+View my publicly-auditable identity here: https://keybase.io/milleniumbug
+
+==================================================================
